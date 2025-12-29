@@ -1,6 +1,6 @@
 # Tonys OpenSurv Manager 1.0
 
-This is a GUI tool I made to help manage `monitor1.yml` config files for OpenSurv. It's built for Linux but works on Windows too if you just want to edit files.
+This is a GUI tool I made to help manage Opensurv YML config files. It's built for Linux but works on Windows too if you just want to edit files.
 
 ![Main Dashboard](assets/dashboard_example.png)
 
