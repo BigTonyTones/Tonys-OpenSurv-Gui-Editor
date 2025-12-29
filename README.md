@@ -6,7 +6,7 @@ This is a GUI tool I made to help manage Opensurv YML config files. It's built f
 
 ## What it does
 
-*   **Add cameras with eaze**
+*   **Add cameras with ease**
 *   **Drag-and-Drop Editor**: Arrange your camera streams easily.
 *   **Live Preview**: Shows you a grid of what your layout will look like.
 ![Preview Layout](assets/preview_layout_example.png)
