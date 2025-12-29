@@ -509,7 +509,7 @@ function updatePreviewInfo() {
 }
 
 function updatePreviewSaveButton() {
-    const footer = document.querySelector('#previewModal .modal-footer');
+    const header = document.querySelector('#previewModal .modal-header');
     let applyBtn = document.getElementById('previewApplyBtn');
     if (previewState.hasChanges && !applyBtn) {
         applyBtn = document.createElement('button');
@@ -517,7 +517,7 @@ function updatePreviewSaveButton() {
         applyBtn.className = 'btn btn-primary';
         applyBtn.textContent = 'Apply Changes';
         applyBtn.addEventListener('click', applyPreviewChanges);
-        footer.insertBefore(applyBtn, document.getElementById('previewModalOk'));
+        header.insertBefore(applyBtn, document.getElementById('previewModalOk'));
     } else if (!previewState.hasChanges && applyBtn) {
         applyBtn.remove();
     }
