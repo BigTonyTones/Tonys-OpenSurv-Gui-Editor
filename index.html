@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tonys OpenSurv Manager 1.0</title>
+    <meta name="description" content="Professional GUI for managing OpenSurv configuration">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <rect width="32" height="32" rx="8" fill="url(#gradient1)" />
+                            <path d="M16 8L8 12V20L16 24L24 20V12L16 8Z" stroke="white" stroke-width="2"
+                                stroke-linejoin="round" />
+                            <circle cx="16" cy="16" r="3" fill="white" />
+                            <defs>
+                                <linearGradient id="gradient1" x1="0" y1="0" x2="32" y2="32">
+                                    <stop offset="0%" stop-color="#667eea" />
+                                    <stop offset="100%" stop-color="#764ba2" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="header-title">
+                        <h1>Tonys OpenSurv Manager 1.0</h1>
+                        <p class="subtitle">Configuration System</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="importBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                        </svg>
+                        Import YAML
+                    </button>
+                    <button class="btn btn-secondary" id="exportBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+                        </svg>
+                        Export YAML
+                    </button>
+                    <button class="btn btn-secondary" id="backupsBtn" title="View Backups">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Backups
+                    </button>
+                    <button class="btn btn-primary" id="saveBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                            <polyline points="17 21 17 13 7 13 7 21" />
+                            <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                        Save Config
+                    </button>
+                    <div class="external-links">
+                        <a href="https://github.com/BigTonyTones/Tonys-OpenSurv-Gui-Editor.git" target="_blank"
+                            class="link-icon" title="View on GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                            </svg>
+                        </a>
+                        <a href="https://buymeacoffee.com/tonytones" target="_blank" class="link-icon"
+                            title="Buy Me a Coffee">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                                <line x1="6" y1="1" x2="6" y2="4" />
+                                <line x1="10" y1="1" x2="10" y2="4" />
+                                <line x1="14" y1="1" x2="14" y2="4" />
+                            </svg>
+                        </a>
+                    </div>
+                    <button class="btn btn-secondary" id="settingsBtn" title="System Settings">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                    </button>
+                    <button class="btn btn-danger-outline" id="rebootBtn" title="Reboot System">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                            <line x1="12" y1="2" x2="12" y2="12" />
+                        </svg>
+                        Reboot
+                    </button>
+                    <button class="btn btn-danger" id="restartBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="23 4 23 10 17 10" />
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                        </svg>
+                        Restart OpenSurv
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Global Settings</h3>
+                    <div class="setting-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="disableAutorotation" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Disable Auto-rotation</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="sidebar-header">
+                        <h3 class="sidebar-title">Screens</h3>
+                        <button class="btn-icon" id="addScreenBtn" title="Add Screen">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="screensList" class="screens-list"></div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div id="welcomeScreen" class="welcome-screen">
+                    <div class="welcome-content">
+                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                            <circle cx="60" cy="60" r="60" fill="url(#gradient2)" opacity="0.1" />
+                            <path d="M60 30L30 45V75L60 90L90 75V45L60 30Z" stroke="url(#gradient2)" stroke-width="3"
+                                stroke-linejoin="round" />
+                            <circle cx="60" cy="60" r="12" fill="url(#gradient2)" />
+                            <defs>
+                                <linearGradient id="gradient2" x1="0" y1="0" x2="120" y2="120">
+                                    <stop offset="0%" stop-color="#667eea" />
+                                    <stop offset="100%" stop-color="#764ba2" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <h2>Welcome to Tonys OpenSurv Manager 1.0</h2>
+                        <p>Select a screen from the sidebar or create a new one to get started</p>
+                    </div>
+                </div>
+
+                <div id="screenEditor" class="screen-editor" style="display: none;">
+                    <div class="editor-header">
+                        <div>
+                            <h2 id="screenTitle">Screen Configuration</h2>
+                            <p class="current-file-path" id="currentFilePath"
+                                style="color: var(--primary-color); font-family: monospace; font-size: 0.9em; margin-bottom: 4px;">
+                            </p>
+                            <p class="screen-subtitle" id="screenSubtitle">Configure streams and settings for this
+                                screen</p>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+
+                            <button class="btn btn-secondary" id="previewScreenBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                                    <line x1="8" y1="21" x2="16" y2="21" />
+                                    <line x1="12" y1="17" x2="12" y2="21" />
+                                </svg>
+                                Preview Layout
+                            </button>
+                            <button class="btn btn-danger-outline" id="deleteScreenBtn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                                Delete Screen
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Screen Settings -->
+                    <div class="settings-panel">
+                        <h3 class="panel-title">Screen Settings</h3>
+                        <div class="settings-grid">
+                            <div class="form-group">
+                                <label for="screenDuration">Duration (seconds)</label>
+                                <input type="number" id="screenDuration" class="form-input" placeholder="30" min="1">
+                                <span class="form-hint">How long this screen will be shown each rotation</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="screenColumns">Number of Columns</label>
+                                <input type="number" id="screenColumns" class="form-input" placeholder="2" min="1">
+                                <span class="form-hint">Grid layout columns</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="screenRotate90" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text">Rotate 90°</span>
+                                </label>
+                                <span class="form-hint">For vertical monitors</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="screenDisableProbing" class="toggle-input">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text">Disable Probing</span>
+                                </label>
+                                <span class="form-hint">Disable stream health checks</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cameras/Streams -->
+                    <div class="cameras-panel">
+                        <div class="panel-header">
+                            <h3 class="panel-title">Camera Streams</h3>
+                            <div style="display: flex; gap: 0.75rem;">
+                                <button class="btn btn-secondary" id="retrieveScreenshotsBtn"
+                                    title="Capture updated thumbnails from streams">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                        <circle cx="12" cy="13" r="4" />
+                                    </svg>
+                                    Retrieve Screenshots
+                                </button>
+                                <button class="btn btn-primary" id="addCameraBtn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path
+                                            d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                                        <circle cx="12" cy="13" r="4" />
+                                    </svg>
+                                    Add Camera
+                                </button>
+                            </div>
+                        </div>
+                        <div id="camerasList" class="cameras-list"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Camera Modal -->
+    <div id="cameraModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Camera</h2>
+                <button class="modal-close" id="modalClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="cameraName">Camera Name (Optional)</label>
+                    <input type="text" id="cameraName" class="form-input" placeholder="e.g., Backyard_Door_WideAngle">
+                    <span class="form-hint">Friendly name for this camera (saved as comment in YAML)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cameraUrl">Stream URL *</label>
+                    <input type="text" id="cameraUrl" class="form-input"
+                        placeholder="rtsp://user:password@192.168.1.100:554/stream">
+                    <span class="form-hint">RTSP, HTTP, HTTPS, or file:// URL</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="cameraImageUrl" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Image URL (not video stream)</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="cameraShowOnTop" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Show on Top (Picture-in-Picture)</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="cameraEnableAudio" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Enable Audio</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="cameraProbeTimeout">Probe Timeout (seconds)</label>
+                    <input type="number" id="cameraProbeTimeout" class="form-input" placeholder="3" min="1">
+                    <span class="form-hint">Time to wait before considering stream unconnectable</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cameraInitTimeout">Init Timeout (seconds)</label>
+                    <input type="number" id="cameraInitTimeout" class="form-input" placeholder="7" min="1">
+                    <span class="form-hint">Time to wait for stream initialization</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cameraMpvOptions">Advanced MPV Options</label>
+                    <input type="text" id="cameraMpvOptions" class="form-input"
+                        placeholder="--rtsp-transport=tcp --profile=low-latency">
+                    <span class="form-hint">Advanced options for MPV player</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="cameraForceCoords" class="toggle-input">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">Use Custom Position (Force Coordinates)</span>
+                    </label>
+                </div>
+
+                <div id="coordsSection" class="coords-section" style="display: none;">
+                    <div class="coords-grid">
+                        <div class="form-group">
+                            <label for="coordX1">X1 (Left)</label>
+                            <input type="number" id="coordX1" class="form-input" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="coordY1">Y1 (Top)</label>
+                            <input type="number" id="coordY1" class="form-input" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="coordX2">X2 (Right)</label>
+                            <input type="number" id="coordX2" class="form-input" placeholder="800" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="coordY2">Y2 (Bottom)</label>
+                            <input type="number" id="coordY2" class="form-input" placeholder="600" min="0">
+                        </div>
+                    </div>
+                    <span class="form-hint">Format: [x1, y1, x2, y2] - Upper left to lower right corner</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+                <button class="btn btn-primary" id="modalSave">Save Camera</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content" style="max-width: 90vw; max-height: 90vh;">
+            <div class="modal-header">
+                <h2>Screen Layout Preview</h2>
+                <button class="modal-close" id="previewModalClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 0; overflow: hidden; position: relative;">
+                <div id="previewCanvas" class="preview-canvas">
+                    <div id="previewGrid" class="preview-grid"></div>
+                </div>
+                <div class="preview-sidebar-overlay">
+                    <h3 class="preview-sidebar-title">Cameras</h3>
+                    <div id="previewCameraList" class="preview-camera-list"></div>
+                    <div class="preview-help">
+                        <p><strong>Tip:</strong> Click a camera to select it, then drag or use arrow keys to move. Drag
+                            the
+                            corner handle to resize.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="preview-controls" style="flex: 1; justify-content: flex-start;">
+                    <div class="resolution-picker">
+                        <span style="font-size: var(--font-size-xs); color: var(--text-muted);">Resolution:</span>
+                        <select id="resPreset">
+                            <optgroup label="16:9 Widescreen">
+                                <option value="1280x720">720p (1280x720)</option>
+                                <option value="1366x768">Laptop (1366x768)</option>
+                                <option value="1600x900">HD+ (1600x900)</option>
+                                <option value="1920x1080" selected>1080p (1920x1080)</option>
+                                <option value="2560x1440">1440p (2560x1440)</option>
+                                <option value="3840x2160">4K UHD (3840x2160)</option>
+                                <option value="5120x2880">5K (5120x2880)</option>
+                                <option value="7680x4320">8K (7680x4320)</option>
+                            </optgroup>
+                            <optgroup label="16:10 & Others">
+                                <option value="1280x800">WXGA (1280x800)</option>
+                                <option value="1440x900">WXGA+ (1440x900)</option>
+                                <option value="1920x1200">WUXGA (1920x1200)</option>
+                                <option value="2560x1600">WQXGA (2560x1600)</option>
+                                <option value="1280x1024">5:4 SXGA (1280x1024)</option>
+                                <option value="1024x768">4:3 XGA (1024x768)</option>
+                            </optgroup>
+                            <option value="custom">Custom...</option>
+                        </select>
+                        <div id="customResInputs" style="display: none; align-items: center; gap: 4px;">
+                            <input type="number" id="resWidth" value="1920" step="1">
+                            <span>x</span>
+                            <input type="number" id="resHeight" value="1080" step="1">
+                        </div>
+                    </div>
+                    <label class="grid-toggle">
+                        <input type="checkbox" id="toggleGrid" checked>
+                        <span>Show Grid</span>
+                    </label>
+                    <label class="grid-toggle">
+                        <input type="checkbox" id="togglePreviewImages" checked>
+                        <span>Show Camera Images</span>
+                    </label>
+                </div>
+                <button class="btn btn-secondary" id="previewModalOk">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title">System Settings</h2>
+                <button class="modal-close" id="settingsModalClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3 style="margin-top: 0; font-size: var(--font-size-base); color: var(--text-primary);">Boot &
+                        Startup</h3>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label class="grid-toggle"
+                            style="justify-content: space-between; padding: var(--spacing-sm) 0;">
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <span style="font-weight: 500; color: var(--text-primary);">Auto-run on system
+                                    boot</span>
+                                <span style="font-size: var(--font-size-xs); color: var(--text-muted);">Launch the GUI
+                                    server automatically when the system starts.</span>
+                            </div>
+                            <input type="checkbox" id="autoStartToggle" style="width: 20px; height: 20px;">
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-section"
+                    style="margin-top: var(--spacing-lg); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: var(--font-size-base); color: var(--text-primary);">Network</h3>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="serverPort"
+                            style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: var(--font-size-sm);">Server
+                            Port</label>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <input type="number" id="serverPort" class="form-input" style="width: 120px;"
+                                placeholder="6453" min="1024" max="65535">
+                            <span style="font-size: var(--font-size-xs); color: var(--text-muted); line-height: 1.4;">
+                                ⚠️ Changing the port will require you to refresh or manually navigate to the new URL.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="settingsModalCloseBtn">Cancel</button>
+                <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Browser Modal -->
+    <div id="fileBrowserModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; height: 80vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2 class="modal-title">Select YAML File</h2>
+                <button class="modal-close" id="fileBrowserModalClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body"
+                style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+                <div class="file-browser-nav">
+                    <div id="fileBrowserBreadcrumbs" class="breadcrumbs"></div>
+                </div>
+                <div id="fileBrowserList" class="file-list">
+                    <!-- Files populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="selectedFilePath"
+                    style="flex: 1; font-size: var(--font-size-xs); color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: var(--spacing-md);">
+                    No file selected
+                </div>
+                <button class="btn btn-secondary" id="fileBrowserModalCancel">Cancel</button>
+                <button class="btn btn-primary" id="fileBrowserModalImport" disabled>Import Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backups Modal -->
+    <div id="backupsModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Configuration Backups</h2>
+                <button class="modal-close" id="backupsModalClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: var(--font-size-sm); color: var(--text-muted); margin-bottom: var(--spacing-md);">
+                    Automatic backups are created every time you save changes.
+                </p>
+                <div id="backupsList" class="backups-list">
+                    <!-- Backup items will be populated here -->
+                    <div class="loading-state">Loading backups...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="backupsModalOk">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="preview-drag.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
