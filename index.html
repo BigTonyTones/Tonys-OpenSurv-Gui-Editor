@@ -376,31 +376,8 @@
     <!-- Screen Preview Modal -->
     <div id="previewModal" class="modal">
         <div class="modal-content" style="max-width: 90vw; max-height: 90vh;">
-            <div class="modal-header">
-                <h2>Screen Layout Preview</h2>
-                <button class="modal-close" id="previewModalClose">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </button>
-            </div>
-            <div class="modal-body" style="padding: 0; overflow: hidden; position: relative;">
-                <div id="previewCanvas" class="preview-canvas">
-                    <div id="previewGrid" class="preview-grid"></div>
-                </div>
-                <div class="preview-sidebar-overlay">
-                    <h3 class="preview-sidebar-title">Cameras</h3>
-                    <div id="previewCameraList" class="preview-camera-list"></div>
-                    <div class="preview-help">
-                        <p><strong>Tip:</strong> Click a camera to select it, then drag or use arrow keys to move. Drag
-                            the
-                            corner handle to resize.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="preview-controls" style="flex: 1; justify-content: flex-start;">
+            <div class="modal-header" style="gap: 1rem; align-items: center;">
+                <div class="preview-controls" style="display: flex; gap: 1rem; align-items: center;">
                     <div class="resolution-picker">
                         <span style="font-size: var(--font-size-xs); color: var(--text-muted);">Resolution:</span>
                         <select id="resPreset">
@@ -439,8 +416,31 @@
                         <span>Show Camera Images</span>
                     </label>
                 </div>
+                <!-- Spacer -->
+                <div style="flex: 1;"></div>
                 <button class="btn btn-secondary" id="previewModalOk">Close</button>
+                <button class="modal-close" id="previewModalClose">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
             </div>
+            <div class="modal-body" style="padding: 0; overflow: hidden; position: relative;">
+                <div id="previewCanvas" class="preview-canvas">
+                    <div id="previewGrid" class="preview-grid"></div>
+                </div>
+                <div class="preview-sidebar-overlay">
+                    <h3 class="preview-sidebar-title">Cameras</h3>
+                    <div id="previewCameraList" class="preview-camera-list"></div>
+                    <div class="preview-help">
+                        <p><strong>Tip:</strong> Click a camera to select it, then drag or use arrow keys to move. Drag
+                            the
+                            corner handle to resize.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
