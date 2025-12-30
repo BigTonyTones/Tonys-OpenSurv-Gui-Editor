@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tonys OpenSurv Manager 1.0 - Backend Server
+Tonys OpenSurv Manager 1.1 - Backend Server
 Provides API endpoints for managing monitor1.yml and restarting OpenSurv
 """
 
@@ -11,7 +11,7 @@ import shutil
 import json
 from datetime import datetime
 
-PROGRAM_NAME = "Tonys OpenSurv Manager 1.0"
+PROGRAM_NAME = "Tonys OpenSurv Manager 1.1"
 
 def check_root():
     """Check if the program is running with root privileges on Linux"""
@@ -22,6 +22,59 @@ def check_root():
         print('Please run with: sudo python3 server.py')
         print('=' * 60)
         sys.exit(1)
+
+def check_ffmpeg():
+    """Check if ffmpeg is available on Windows and offer to download it"""
+    if os.name != 'nt':
+        return
+
+    # Check if ffmpeg is in PATH or current directory
+    if shutil.which('ffmpeg') or os.path.exists('ffmpeg.exe'):
+        return
+
+    print('=' * 60)
+    print(f'{PROGRAM_NAME} - FFmpeg Check')
+    print('=' * 60)
+    print('FFmpeg is missing. It is required for screenshot capture.')
+    print('Download source: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip')
+    print('=' * 60)
+    
+    confirm = input('\nWould you like to download FFmpeg from the official source now? (y/n): ').lower()
+    if confirm != 'y':
+        print('Skipping FFmpeg download. Screenshot features may not work.')
+        return
+
+    print('Downloading FFmpeg (this may take a minute)...')
+    try:
+        import urllib.request
+        import zipfile
+        
+        url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+        zip_path = "ffmpeg.zip"
+        
+        # Download
+        print(f"Downloading from {url}...")
+        urllib.request.urlretrieve(url, zip_path)
+        
+        print('Extracting...')
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            # Find the ffmpeg.exe in the zip
+            ffmpeg_file = next((f for f in zip_ref.namelist() if f.endswith('bin/ffmpeg.exe')), None)
+            
+            if ffmpeg_file:
+                # Extract directly to current directory
+                with zip_ref.open(ffmpeg_file) as source, open('ffmpeg.exe', 'wb') as target:
+                    shutil.copyfileobj(source, target)
+                print('FFmpeg installed successfully!')
+            else:
+                print('Error: Could not find ffmpeg.exe in the downloaded archive.')
+                
+        # Cleanup
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+            
+    except Exception as e:
+        print(f'Error downloading/installing FFmpeg: {e}')
 
 # Auto-install requirements
 def install_requirements():
@@ -76,6 +129,7 @@ def install_requirements():
 if os.name == 'posix':
     check_root()
 install_requirements()
+check_ffmpeg()
 
 # Import dependencies AFTER check/installation
 try:
@@ -506,4 +560,10 @@ if __name__ == '__main__':
     print(f'Starting server on http://localhost:{port}')
     print('Press Ctrl+C to stop')
     print('=' * 60)
+
+    if os.name == 'nt' and not os.environ.get("WERKZEUG_RUN_MAIN"):
+        import webbrowser
+        from threading import Timer
+        Timer(1.5, lambda: webbrowser.open(f'http://localhost:{port}')).start()
+
     app.run(host='0.0.0.0', port=port, debug=True)

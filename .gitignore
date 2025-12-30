@@ -33,3 +33,8 @@ wheels/
 # System
 .DS_Store
 Thumbs.db
+
+# Tools
+ffmpeg.exe
+ffmpeg.zip
+ffmpeg_temp/
