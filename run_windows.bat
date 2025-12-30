@@ -1,5 +1,5 @@
 @echo off
-TITLE Tonys OpenSurv Manager 1.1
+TITLE Tonys OpenSurv Manager 1.2
 echo Starting OpenSurv Manager...
 echo.
 

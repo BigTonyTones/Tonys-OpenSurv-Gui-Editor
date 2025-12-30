@@ -1,4 +1,6 @@
 # User Configuration & Data
+config/monitor1.yml
+config/monitor1.yaml
 monitor1.yml
 monitor1.yaml
 backups/
@@ -35,6 +37,7 @@ wheels/
 Thumbs.db
 
 # Tools
+bin/
 ffmpeg.exe
 ffmpeg.zip
 ffmpeg_temp/

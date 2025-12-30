@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Tonys OpenSurv Manager 1.1 - Backend Server
+Tonys OpenSurv Manager 1.2 - Backend Server
 Provides API endpoints for managing monitor1.yml and restarting OpenSurv
 """
 
@@ -11,7 +11,7 @@ import shutil
 import json
 from datetime import datetime
 
-PROGRAM_NAME = "Tonys OpenSurv Manager 1.1"
+PROGRAM_NAME = "Tonys OpenSurv Manager 1.2"
 
 def check_root():
     """Check if the program is running with root privileges on Linux"""
@@ -28,8 +28,8 @@ def check_ffmpeg():
     if os.name != 'nt':
         return
 
-    # Check if ffmpeg is in PATH or current directory
-    if shutil.which('ffmpeg') or os.path.exists('ffmpeg.exe'):
+    # Check if ffmpeg is in PATH or bin directory
+    if shutil.which('ffmpeg') or os.path.exists(os.path.join('bin', 'ffmpeg.exe')):
         return
 
     print('=' * 60)
@@ -62,10 +62,12 @@ def check_ffmpeg():
             ffmpeg_file = next((f for f in zip_ref.namelist() if f.endswith('bin/ffmpeg.exe')), None)
             
             if ffmpeg_file:
-                # Extract directly to current directory
-                with zip_ref.open(ffmpeg_file) as source, open('ffmpeg.exe', 'wb') as target:
+                # Ensure bin directory exists
+                os.makedirs('bin', exist_ok=True)
+                # Extract to bin directory
+                with zip_ref.open(ffmpeg_file) as source, open(os.path.join('bin', 'ffmpeg.exe'), 'wb') as target:
                     shutil.copyfileobj(source, target)
-                print('FFmpeg installed successfully!')
+                print('FFmpeg installed successfully to bin/ folder!')
             else:
                 print('Error: Could not find ffmpeg.exe in the downloaded archive.')
                 
@@ -139,7 +141,7 @@ except ImportError as e:
     print(f"Critical Error: Failed to import dependencies: {e}")
     sys.exit(1)
 
-app = Flask(__name__, static_folder='.')
+app = Flask(__name__, static_folder='web')
 CORS(app)
 
 # Configuration
@@ -147,7 +149,7 @@ CORS(app)
 if os.name == 'posix':
     CONFIG_FILE = '/etc/opensurv/monitor1.yml'
 else:
-    CONFIG_FILE = 'monitor1.yml' # Local for Windows dev
+    CONFIG_FILE = os.path.join('config', 'monitor1.yml') # Local for Windows dev
 SETTINGS_FILE = 'gui_settings.json'
 BACKUP_DIR = 'backups'
 
@@ -174,11 +176,11 @@ os.makedirs(BACKUP_DIR, exist_ok=True)
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory('web', 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory('.', path)
+    return send_from_directory('web', path)
 
 @app.route('/api/config', methods=['GET'])
 def get_config():
@@ -259,6 +261,14 @@ def reboot_system():
 def serve_screenshot(filename):
     return send_from_directory('screenshots', filename)
 
+def get_ffmpeg_command():
+    """Get the correct ffmpeg command/path for the current system"""
+    if os.name == 'nt':
+        local_path = os.path.join(os.getcwd(), 'bin', 'ffmpeg.exe')
+        if os.path.exists(local_path):
+            return local_path
+    return 'ffmpeg'
+
 @app.route('/api/screenshots/capture', methods=['POST'])
 def capture_screenshots():
     try:
@@ -293,8 +303,9 @@ def capture_screenshots():
             # -frames:v 1: grab 1 frame
             # -q:v 2: quality
             # Try TCP first (Reliable)
+            ffmpeg_cmd = get_ffmpeg_command()
             cmd_tcp = [
-                'ffmpeg', '-y', '-nostdin',
+                ffmpeg_cmd, '-y', '-nostdin',
                 '-rtsp_transport', 'tcp',
                 '-i', url,
                 '-frames:v', '1',
@@ -315,7 +326,7 @@ def capture_screenshots():
             if not success:
                 print(f"Retrying with UDP for {url}...")
                 cmd_udp = [
-                    'ffmpeg', '-y', '-nostdin',
+                    ffmpeg_cmd, '-y', '-nostdin',
                     '-i', url,
                     '-frames:v', '1',
                     '-q:v', '5', 
