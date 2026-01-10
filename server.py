@@ -14,7 +14,7 @@ import time
 from updater import GitHubUpdater
 
 
-VERSION = "1.2"
+VERSION = "1.3"
 PROGRAM_NAME = f"Tonys OpenSurv Manager {VERSION}"
 REPO_OWNER = "BigTonyTones"
 REPO_NAME = "Tonys-OpenSurv-Gui-Editor"

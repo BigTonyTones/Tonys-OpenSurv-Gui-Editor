@@ -306,7 +306,12 @@ function renderCamerasList() {
         if (stream.imageurl) badges.push('<span class="camera-badge active">Image URL</span>');
         if (stream.showontop) badges.push('<span class="camera-badge active">Show on Top</span>');
         if (stream.enableaudio) badges.push('<span class="camera-badge active">Audio</span>');
-        if (stream.force_coordinates) badges.push('<span class="camera-badge">Custom Position</span>');
+        if (stream.force_coordinates) {
+            const coords = Array.isArray(stream.force_coordinates) ?
+                `[${stream.force_coordinates.join(', ')}]` :
+                '(Invalid Coords)';
+            badges.push(`<span class="camera-badge">Custom Position ${coords}</span>`);
+        }
         if (stream.probe_timeout) badges.push(`<span class="camera-badge">Timeout: ${stream.probe_timeout}s</span>`);
 
         // Use camera name if available, otherwise show URL
@@ -1422,7 +1427,7 @@ async function checkForUpdates() {
 
         // Update current version if returned
         if (document.getElementById('currentVersionDisplay')) {
-            document.getElementById('currentVersionDisplay').textContent = data.current_version || '1.2';
+            document.getElementById('currentVersionDisplay').textContent = data.current_version || '1.3';
         }
 
         if (data.update_available) {
