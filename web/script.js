@@ -299,63 +299,77 @@ function renderCamerasList() {
     }
 
     screen.streams.forEach((stream, index) => {
-        const card = document.createElement('div');
-        card.className = 'camera-card';
+        try {
+            const card = document.createElement('div');
+            card.className = 'camera-card';
 
-        const badges = [];
-        if (stream.imageurl) badges.push('<span class="camera-badge active">Image URL</span>');
-        if (stream.showontop) badges.push('<span class="camera-badge active">Show on Top</span>');
-        if (stream.enableaudio) badges.push('<span class="camera-badge active">Audio</span>');
-        if (stream.force_coordinates) {
-            const coords = Array.isArray(stream.force_coordinates) ?
-                `[${stream.force_coordinates.join(', ')}]` :
-                '(Invalid Coords)';
-            badges.push(`<span class="camera-badge">Custom Position ${coords}</span>`);
+            const badges = [];
+            if (stream.imageurl) badges.push('<span class="camera-badge active">Image URL</span>');
+            if (stream.showontop) badges.push('<span class="camera-badge active">Show on Top</span>');
+            if (stream.enableaudio) badges.push('<span class="camera-badge active">Audio</span>');
+
+            if (stream.force_coordinates) {
+                let coordsText = '(Invalid Coords)';
+                if (Array.isArray(stream.force_coordinates)) {
+                    coordsText = `[${stream.force_coordinates.join(', ')}]`;
+                } else {
+                    console.warn(`Camera ${index} has invalid force_coordinates format:`, stream.force_coordinates);
+                }
+                badges.push(`<span class="camera-badge">Custom Position ${coordsText}</span>`);
+            }
+
+            if (stream.probe_timeout) badges.push(`<span class="camera-badge">Timeout: ${stream.probe_timeout}s</span>`);
+
+            // Use camera name if available, otherwise show URL
+            const displayName = stream.name || 'Camera ' + (index + 1);
+            const displayUrl = stream.name ? stream.url : '';
+            const screenshot = state.screenshots && state.screenshots[stream.url] ? state.screenshots[stream.url] : null;
+
+            card.innerHTML = `
+                ${screenshot ? `<img src="/screenshots/${screenshot}" class="camera-preview" alt="${displayName}">` : ''}
+                <div class="camera-header">
+                    <div class="camera-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                    </div>
+                    <div class="camera-actions">
+                        <button class="camera-action-btn play" data-index="${index}" title="Play in VLC">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                        </button>
+                        <button class="camera-action-btn edit" data-index="${index}" title="Edit">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                        </button>
+                        <button class="camera-action-btn delete" data-index="${index}" title="Delete">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="camera-name">${displayName}</div>
+                ${displayUrl ? `<div class="camera-url">${displayUrl}</div>` : `<div class="camera-url">${stream.url || 'No URL'}</div>`}
+                <div class="camera-details">
+                    ${badges.join('')}
+                </div>
+            `;
+
+            camerasList.appendChild(card);
+        } catch (err) {
+            console.error('Error rendering camera card:', err);
+            const errorCard = document.createElement('div');
+            errorCard.className = 'camera-card';
+            errorCard.style.border = '1px solid var(--danger-color)';
+            errorCard.innerHTML = `<div style="padding: 1rem; color: var(--danger-color);">Error rendering camera ${index + 1}</div>`;
+            camerasList.appendChild(errorCard);
         }
-        if (stream.probe_timeout) badges.push(`<span class="camera-badge">Timeout: ${stream.probe_timeout}s</span>`);
-
-        // Use camera name if available, otherwise show URL
-        const displayName = stream.name || 'Camera ' + (index + 1);
-        const displayUrl = stream.name ? stream.url : '';
-        const screenshot = state.screenshots[stream.url];
-
-        card.innerHTML = `
-            ${screenshot ? `<img src="/screenshots/${screenshot}" class="camera-preview" alt="${displayName}">` : ''}
-            <div class="camera-header">
-                <div class="camera-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                        <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                </div>
-                <div class="camera-actions">
-                    <button class="camera-action-btn play" data-index="${index}" title="Play in VLC">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="5 3 19 12 5 21 5 3"/>
-                        </svg>
-                    </button>
-                    <button class="camera-action-btn edit" data-index="${index}" title="Edit">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                    </button>
-                    <button class="camera-action-btn delete" data-index="${index}" title="Delete">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="camera-name">${displayName}</div>
-            ${displayUrl ? `<div class="camera-url">${displayUrl}</div>` : `<div class="camera-url">${stream.url}</div>`}
-            <div class="camera-details">
-                ${badges.join('')}
-            </div>
-        `;
-
-        camerasList.appendChild(card);
     });
 
     // Add event listeners for play, edit and delete buttons
@@ -397,7 +411,7 @@ function renderScreenEditor() {
 
     document.getElementById('screenTitle').textContent = `Screen ${state.currentScreenIndex + 1}`;
     document.getElementById('currentFilePath').textContent = state.currentFilePath;
-    document.getElementById('screenSubtitle').textContent = `Configure streams and settings for this screen`;
+    // document.getElementById('screenSubtitle').textContent = `Configure streams and settings for this screen`;
 
     // Populate screen settings
     document.getElementById('screenDuration').value = screen.duration || '';
@@ -949,8 +963,14 @@ async function loadConfig() {
             state.config = YAMLParser.parse(data.content);
 
             // Update UI
+            // Update UI
             document.getElementById('disableAutorotation').checked = state.config.essentials.disable_autorotation;
             renderScreensList();
+
+            // Select first screen by default
+            if (state.config.essentials.screens.length > 0) {
+                selectScreen(0);
+            }
 
             showToast('Config Loaded', 'Configuration loaded successfully', 'success');
         } else {

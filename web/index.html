@@ -175,75 +175,80 @@
                 </div>
 
                 <div id="screenEditor" class="screen-editor" style="display: none;">
-                    <div class="editor-header">
-                        <div>
-                            <h2 id="screenTitle">Screen Configuration</h2>
-                            <p class="current-file-path" id="currentFilePath"
-                                style="color: var(--primary-color); font-family: monospace; font-size: 0.9em; margin-bottom: 4px;">
-                            </p>
-                            <p class="screen-subtitle" id="screenSubtitle">Configure streams and settings for this
-                                screen</p>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem;">
+                    <div class="editor-header" style="margin-bottom: 20px; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px;">
+                                <h2 id="screenTitle" style="margin: 0; font-size: 1.5rem; line-height: 1;">Screen
+                                    Configuration</h2>
+                                <span id="currentFilePath"
+                                    style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted); opacity: 0.6;"></span>
+                            </div>
 
-                            <button class="btn btn-secondary" id="previewScreenBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
+                            <!-- Compact Controls Row -->
+                            <div class="screen-controls-row"
+                                style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <label for="screenDuration"
+                                        style="font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap;">Duration:</label>
+                                    <input type="number" id="screenDuration" class="form-input"
+                                        style="width: 60px; height: 30px; padding: 4px 8px;" placeholder="30" min="1">
+                                    <span style="font-size: 0.85rem; color: var(--text-muted);">s</span>
+                                </div>
+
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <label for="screenColumns"
+                                        style="font-size: 0.85rem; color: var(--text-secondary); white-space: nowrap;">Cols:</label>
+                                    <input type="number" id="screenColumns" class="form-input"
+                                        style="width: 60px; height: 30px; padding: 4px 8px;" placeholder="2" min="1">
+                                </div>
+
+                                <div class="separator-vertical"
+                                    style="width: 1px; height: 24px; background: var(--border-color);"></div>
+
+                                <label class="toggle-label compact-toggle" style="margin: 0;">
+                                    <input type="checkbox" id="screenRotate90" class="toggle-input">
+                                    <span class="toggle-slider compact-slider"
+                                        style="width: 32px; height: 18px;"></span>
+                                    <span class="toggle-text" style="font-size: 0.85rem;">Rotate 90°</span>
+                                </label>
+
+                                <label class="toggle-label compact-toggle" style="margin: 0;">
+                                    <input type="checkbox" id="screenDisableProbing" class="toggle-input">
+                                    <span class="toggle-slider compact-slider"
+                                        style="width: 32px; height: 18px;"></span>
+                                    <span class="toggle-text" style="font-size: 0.85rem;">No Probe</span>
+                                </label>
+
+                                <label class="toggle-label compact-toggle" style="margin: 0;">
+                                    <input type="checkbox" id="disableAutorotation" class="toggle-input">
+                                    <span class="toggle-slider compact-slider"
+                                        style="width: 32px; height: 18px;"></span>
+                                    <span class="toggle-text" style="font-size: 0.85rem;">Global No-Rotate</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; align-items: center;">
+                            <button class="btn btn-sm btn-secondary" id="previewScreenBtn"
+                                style="padding: 6px 12px; height: 32px; font-size: 0.85rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" style="margin-right: 6px;">
                                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
                                     <line x1="8" y1="21" x2="16" y2="21" />
                                     <line x1="12" y1="17" x2="12" y2="21" />
                                 </svg>
-                                Preview Layout
+                                Preview
                             </button>
-                            <button class="btn btn-danger-outline" id="deleteScreenBtn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
+                            <button class="btn btn-sm btn-danger-outline" id="deleteScreenBtn"
+                                style="padding: 6px 12px; height: 32px; font-size: 0.85rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" style="margin-right: 6px;">
                                     <polyline points="3 6 5 6 21 6" />
                                     <path
                                         d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                                 </svg>
-                                Delete Screen
+                                Delete
                             </button>
-                        </div>
-                    </div>
-
-                    <!-- Screen Settings -->
-                    <div class="settings-panel compact-panel">
-                        <div class="panel-header compact-header">
-                            <h3 class="panel-title">Screen Settings</h3>
-                        </div>
-                        <div class="settings-grid compact-grid">
-                            <div class="form-group compact-group">
-                                <label for="screenDuration">Duration (sec)</label>
-                                <input type="number" id="screenDuration" class="form-input compact-input"
-                                    placeholder="30" min="1">
-                            </div>
-                            <div class="form-group compact-group">
-                                <label for="screenColumns">Columns</label>
-                                <input type="number" id="screenColumns" class="form-input compact-input" placeholder="2"
-                                    min="1">
-                            </div>
-                            <div class="form-group compact-group checkbox-group">
-                                <label class="toggle-label compact-toggle">
-                                    <input type="checkbox" id="screenRotate90" class="toggle-input">
-                                    <span class="toggle-slider compact-slider"></span>
-                                    <span class="toggle-text">Rotate 90°</span>
-                                </label>
-                            </div>
-                            <div class="form-group compact-group checkbox-group">
-                                <label class="toggle-label compact-toggle">
-                                    <input type="checkbox" id="screenDisableProbing" class="toggle-input">
-                                    <span class="toggle-slider compact-slider"></span>
-                                    <span class="toggle-text">Disable Probing</span>
-                                </label>
-                            </div>
-                            <div class="form-group compact-group checkbox-group">
-                                <label class="toggle-label compact-toggle">
-                                    <input type="checkbox" id="disableAutorotation" class="toggle-input">
-                                    <span class="toggle-slider compact-slider"></span>
-                                    <span class="toggle-text">Disable Auto-rotation (Global)</span>
-                                </label>
-                            </div>
                         </div>
                     </div>
 
