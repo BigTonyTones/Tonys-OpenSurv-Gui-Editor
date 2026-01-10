@@ -136,17 +136,7 @@
                 </div>
             </div>
             <!-- Screens Bar (Sub-header) -->
-            <div class="screens-bar">
-                <div id="screensList" class="screens-tabs">
-                    <!-- Tabs rendered here -->
-                </div>
-                <button class="btn-icon-small" id="addScreenBtn" title="Add Screen">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19" />
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                    </svg>
-                </button>
-            </div>
+
         </header>
 
         <!-- Main Content -->
@@ -177,9 +167,22 @@
                 <div id="screenEditor" class="screen-editor" style="display: none;">
                     <div class="editor-header" style="margin-bottom: 20px; align-items: center;">
                         <div style="flex: 1;">
-                            <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px;">
-                                <h2 id="screenTitle" style="margin: 0; font-size: 1.5rem; line-height: 1;">Screen
-                                    Configuration</h2>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <!-- Tabs injected here -->
+                                <div id="screensList" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+
+                                <button class="btn-icon-small" id="addScreenBtn" title="Add New Screen"
+                                    style="width: 28px; height: 28px; border-radius: 4px; background: rgba(255,255,255,0.1);">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <line x1="12" y1="5" x2="12" y2="19" />
+                                        <line x1="5" y1="12" x2="19" y2="12" />
+                                    </svg>
+                                </button>
+
+                                <div class="separator-vertical"
+                                    style="width: 1px; height: 20px; background: var(--border-color); margin: 0 8px;">
+                                </div>
                                 <span id="currentFilePath"
                                     style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted); opacity: 0.6;"></span>
                             </div>

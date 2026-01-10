@@ -409,7 +409,7 @@ function renderScreenEditor() {
 
     const screen = state.config.essentials.screens[state.currentScreenIndex];
 
-    document.getElementById('screenTitle').textContent = `Screen ${state.currentScreenIndex + 1}`;
+    // document.getElementById('screenTitle').textContent = `Screen ${state.currentScreenIndex + 1}`;
     document.getElementById('currentFilePath').textContent = state.currentFilePath;
     // document.getElementById('screenSubtitle').textContent = `Configure streams and settings for this screen`;
 
