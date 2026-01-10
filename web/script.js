@@ -262,11 +262,10 @@ function showToast(title, message, type = 'info') {
 }
 
 // ===== Clipboard Utility =====
+// ===== Clipboard Utility =====
 async function copyToClipboard(text, btnElement) {
-    try {
-        await navigator.clipboard.writeText(text);
-
-        // Visual feedback
+    // Helper to show success feedback
+    const showSuccess = () => {
         const originalText = btnElement.innerHTML;
         const originalClass = btnElement.className;
 
@@ -282,10 +281,41 @@ async function copyToClipboard(text, btnElement) {
             btnElement.className = originalClass;
             btnElement.innerHTML = originalText;
         }, 2000);
+    };
+
+    try {
+        // Try modern API first
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            showSuccess();
+            return;
+        }
+
+        // Fallback for non-secure contexts (useful for local IP access)
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Ensure it's not visible but part of DOM
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        if (successful) {
+            showSuccess();
+        } else {
+            throw new Error('execCommand fallback failed');
+        }
 
     } catch (err) {
         console.error('Failed to copy text: ', err);
-        showToast('Error', 'Failed to copy to clipboard', 'error');
+        showToast('Error', 'Failed to copy to clipboard: ' + err.message, 'error');
     }
 }
 
@@ -1461,6 +1491,7 @@ async function checkForUpdates() {
     const statusSubtext = document.getElementById('updateStatusSubtext');
     const checkBtn = document.getElementById('checkForUpdatesBtn');
     const updateBtn = document.getElementById('performUpdateBtn');
+    const reinstallBtn = document.getElementById('reinstallUpdateBtn');
     const releaseNotes = document.getElementById('updateReleaseNotes');
 
     if (!statusText) return; // Guard clause
@@ -1468,6 +1499,7 @@ async function checkForUpdates() {
     statusText.textContent = 'Checking for updates...';
     checkBtn.disabled = true;
     updateBtn.style.display = 'none';
+    if (reinstallBtn) reinstallBtn.style.display = 'none';
     releaseNotes.style.display = 'none';
 
     try {
@@ -1476,13 +1508,14 @@ async function checkForUpdates() {
 
         // Update current version if returned
         if (document.getElementById('currentVersionDisplay')) {
-            document.getElementById('currentVersionDisplay').textContent = data.current_version || '1.3';
+            document.getElementById('currentVersionDisplay').textContent = data.current_version || '1.3.1';
         }
 
         if (data.update_available) {
-            statusText.textContent = `New version available: v${data.latest_version}`;
-            statusSubtext.style.color = '#10b981'; // Success color
+            statusText.textContent = `Update Available: ${data.latest_version}`;
+            statusText.style.color = 'var(--success-color)';
             statusSubtext.textContent = 'A new update is available for download.';
+            statusSubtext.style.color = 'var(--text-muted)';
 
             updateDownloadUrl = data.download_url;
             updateBtn.style.display = 'block';
@@ -1496,9 +1529,15 @@ async function checkForUpdates() {
             statusSubtext.textContent = data.error;
             statusSubtext.style.color = '#ef4444'; // Danger color
         } else {
-            statusText.textContent = 'Up to date';
-            statusSubtext.textContent = `You are on the latest version (v${data.latest_version || data.current_version})`;
+            statusText.textContent = 'You are on the latest version';
+            statusText.style.color = 'var(--text-secondary)';
+            statusSubtext.textContent = `Current version: v${data.current_version}`;
             statusSubtext.style.color = 'var(--text-muted)';
+            // Still allow reinstall if we got a download URL
+            if (data.download_url) {
+                updateDownloadUrl = data.download_url;
+                if (reinstallBtn) reinstallBtn.style.display = 'block';
+            }
         }
     } catch (error) {
         console.error('Update check error:', error);
@@ -1513,13 +1552,19 @@ async function checkForUpdates() {
 async function performUpdate() {
     if (!updateDownloadUrl) return;
 
-    if (!confirm('This will download and install the update, then restart the application. Continue?')) return;
-
     const statusText = document.getElementById('updateStatusText');
     const updateBtn = document.getElementById('performUpdateBtn');
+    const reinstallBtn = document.getElementById('reinstallUpdateBtn');
+    const checkBtn = document.getElementById('checkForUpdatesBtn'); // Get check button too
 
-    statusText.textContent = 'Starting update...';
+    if (!confirm('This will download and install the version from GitHub. The application will restart. Continue?')) {
+        return;
+    }
+
+    statusText.textContent = 'Updating... Please wait.';
     updateBtn.disabled = true;
+    if (reinstallBtn) reinstallBtn.disabled = true;
+    if (checkBtn) checkBtn.disabled = true; // Disable check button during update
     updateBtn.innerHTML = 'Updating...';
 
     try {

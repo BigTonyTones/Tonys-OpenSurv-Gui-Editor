@@ -33,20 +33,20 @@ class GitHubUpdater:
                 latest_tag = data.get('tag_name', '').lstrip('v')
                 
                 # Simple version comparison
-                if self._compare_versions(latest_tag, self.current_version) > 0:
-                    # Find zipball or asset
-                    download_url = data.get('zipball_url') # Default to source code zip
-                    
-                    # If there are assets, look for a specific release zip if preferred, 
-                    # otherwise use the first one or source code.
-                    # For this project, source code zip is probably best.
-                    
-                    return {
-                        'update_available': True,
-                        'latest_version': latest_tag,
-                        'release_notes': data.get('body', ''),
-                        'download_url': download_url
-                    }
+                # If local version is greater than remote version, we still allow "update" if user forces it,
+                # but automatically we just check if it's different or just return the data so frontend can decide.
+                
+                download_url = data.get('zipball_url')
+
+                is_newer = self._compare_versions(latest_tag, self.current_version) > 0
+                
+                # We return the download URL even if it's not newer, so "Reinstall" can work
+                return {
+                    'update_available': is_newer,
+                    'latest_version': latest_tag,
+                    'release_notes': data.get('body', ''),
+                    'download_url': download_url
+                }
                 
                 return {
                     'update_available': False, 
