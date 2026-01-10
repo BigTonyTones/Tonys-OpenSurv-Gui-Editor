@@ -271,14 +271,8 @@ body {
 }
 
 /* ===== Sidebar ===== */
-.sidebar {
-    width: 320px;
-    background: var(--bg-secondary);
-    border-right: 1px solid var(--border-color);
-    padding: var(--spacing-xl);
-    overflow-y: auto;
-    height: calc(100vh - 88px);
-}
+/* ===== Sidebar Removed ===== */
+/* Old sidebar styles removed */
 
 .sidebar-section {
     margin-bottom: var(--spacing-xl);
@@ -356,57 +350,138 @@ body {
     font-weight: 500;
 }
 
-/* ===== Screens List ===== */
-.screens-list {
+/* ===== Screens Bar & Tabs ===== */
+.screens-bar {
+    width: 100%;
+    height: 50px;
+    background: var(--bg-secondary);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-}
-
-.screen-item {
-    padding: var(--spacing-md);
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    cursor: pointer;
-    transition: all var(--transition-base);
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+    padding: 0 var(--spacing-xl);
+    gap: var(--spacing-md);
 }
 
-.screen-item:hover {
-    background: var(--bg-hover);
-    border-color: var(--primary-color);
-    transform: translateX(4px);
+.screens-tabs {
+    display: flex;
+    height: 100%;
+    overflow-x: auto;
+    gap: 2px;
 }
 
-.screen-item.active {
-    background: var(--primary-gradient);
-    border-color: transparent;
-    box-shadow: var(--shadow-md);
-}
-
-.screen-item-content {
-    flex: 1;
-}
-
-.screen-item-title {
-    font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-}
-
-.screen-item-info {
-    font-size: var(--font-size-xs);
+.screen-tab {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-lg);
+    height: 100%;
     color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    border-top: 2px solid transparent;
+    /* balance */
+    transition: all var(--transition-base);
+    white-space: nowrap;
 }
 
-.screen-item.active .screen-item-title,
-.screen-item.active .screen-item-info {
-    color: white;
+.screen-tab:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.02);
 }
+
+.screen-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.btn-icon-small {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-icon-small:hover {
+    transform: scale(1.1);
+}
+
+/* ===== Compact Settings ===== */
+.compact-panel {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    background: var(--bg-secondary);
+    /* Darker contrast */
+}
+
+.compact-header {
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.compact-header .panel-title {
+    font-size: var(--font-size-base);
+    margin-bottom: 0;
+}
+
+.compact-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.compact-group {
+    min-width: 100px;
+    max-width: 150px;
+    gap: 4px;
+}
+
+.compact-group label {
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+}
+
+.compact-input {
+    padding: 4px 8px;
+    height: 32px;
+    font-size: var(--font-size-sm);
+}
+
+.compact-group.checkbox-group {
+    padding-bottom: 4px;
+    /* Align with inputs */
+    max-width: none;
+}
+
+.compact-toggle {
+    gap: 8px;
+}
+
+.compact-slider {
+    width: 36px;
+    height: 20px;
+}
+
+.compact-slider::before {
+    width: 14px;
+    height: 14px;
+    top: 2px;
+}
+
+.toggle-input:checked+.compact-slider::before {
+    transform: translateX(16px);
+}
+
 
 /* ===== Content Area ===== */
 .content-area {
@@ -1334,7 +1409,8 @@ body {
         flex-wrap: wrap;
     }
 
-    .settings-grid {
+    .settings-grid,
+    .compact-grid {
         grid-template-columns: 1fr;
     }
 }

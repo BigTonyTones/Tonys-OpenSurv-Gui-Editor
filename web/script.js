@@ -267,16 +267,13 @@ function renderScreensList() {
     screensList.innerHTML = '';
 
     state.config.essentials.screens.forEach((screen, index) => {
-        const screenItem = document.createElement('div');
-        screenItem.className = `screen-item ${state.currentScreenIndex === index ? 'active' : ''}`;
-        screenItem.innerHTML = `
-            <div class="screen-item-content">
-                <div class="screen-item-title">Screen ${index + 1}</div>
-                <div class="screen-item-info">${screen.streams.length} camera${screen.streams.length !== 1 ? 's' : ''}</div>
-            </div>
-        `;
-        screenItem.addEventListener('click', () => selectScreen(index));
-        screensList.appendChild(screenItem);
+        const screenTab = document.createElement('div');
+        screenTab.className = `screen-tab ${state.currentScreenIndex === index ? 'active' : ''}`;
+        screenTab.textContent = `Screen ${index + 1}`;
+        screenTab.title = `${screen.streams.length} camera(s)`;
+
+        screenTab.addEventListener('click', () => selectScreen(index));
+        screensList.appendChild(screenTab);
     });
 }
 
@@ -639,6 +636,11 @@ async function openSettingsModal() {
     }
 
     modal.classList.add('active');
+
+    // Check for updates
+    if (typeof checkForUpdates === 'function') {
+        checkForUpdates();
+    }
 }
 
 function closeSettingsModal() {
@@ -1280,6 +1282,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('importBtn').addEventListener('click', importConfig);
     document.getElementById('exportBtn').addEventListener('click', exportConfig);
     document.getElementById('saveBtn').addEventListener('click', saveConfig);
+    document.getElementById('headerUpdatesBtn').addEventListener('click', () => {
+        openSettingsModal();
+        // Scroll to bottom to show updates section
+        const modalBody = document.querySelector('#settingsModal .modal-body');
+        if (modalBody) setTimeout(() => modalBody.scrollTop = modalBody.scrollHeight, 100);
+    });
     document.getElementById('backupsBtn').addEventListener('click', openBackupsModal);
     document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
     document.getElementById('restartBtn').addEventListener('click', restartOpenSurv);
@@ -1390,3 +1398,110 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// ===== Update Management =====
+let updateDownloadUrl = null;
+
+async function checkForUpdates() {
+    const statusText = document.getElementById('updateStatusText');
+    const statusSubtext = document.getElementById('updateStatusSubtext');
+    const checkBtn = document.getElementById('checkForUpdatesBtn');
+    const updateBtn = document.getElementById('performUpdateBtn');
+    const releaseNotes = document.getElementById('updateReleaseNotes');
+
+    if (!statusText) return; // Guard clause
+
+    statusText.textContent = 'Checking for updates...';
+    checkBtn.disabled = true;
+    updateBtn.style.display = 'none';
+    releaseNotes.style.display = 'none';
+
+    try {
+        const response = await fetch(`${API_BASE}/api/update/check`);
+        const data = await response.json();
+
+        // Update current version if returned
+        if (document.getElementById('currentVersionDisplay')) {
+            document.getElementById('currentVersionDisplay').textContent = data.current_version || '1.2';
+        }
+
+        if (data.update_available) {
+            statusText.textContent = `New version available: v${data.latest_version}`;
+            statusSubtext.style.color = '#10b981'; // Success color
+            statusSubtext.textContent = 'A new update is available for download.';
+
+            updateDownloadUrl = data.download_url;
+            updateBtn.style.display = 'block';
+
+            if (data.release_notes) {
+                releaseNotes.textContent = data.release_notes;
+                releaseNotes.style.display = 'block';
+            }
+        } else if (data.error) {
+            statusText.textContent = 'Check failed';
+            statusSubtext.textContent = data.error;
+            statusSubtext.style.color = '#ef4444'; // Danger color
+        } else {
+            statusText.textContent = 'Up to date';
+            statusSubtext.textContent = `You are on the latest version (v${data.latest_version || data.current_version})`;
+            statusSubtext.style.color = 'var(--text-muted)';
+        }
+    } catch (error) {
+        console.error('Update check error:', error);
+        statusText.textContent = 'Check failed';
+        statusSubtext.textContent = 'Could not connect to update server';
+        statusSubtext.style.color = '#ef4444'; // Danger color
+    } finally {
+        checkBtn.disabled = false;
+    }
+}
+
+async function performUpdate() {
+    if (!updateDownloadUrl) return;
+
+    if (!confirm('This will download and install the update, then restart the application. Continue?')) return;
+
+    const statusText = document.getElementById('updateStatusText');
+    const updateBtn = document.getElementById('performUpdateBtn');
+
+    statusText.textContent = 'Starting update...';
+    updateBtn.disabled = true;
+    updateBtn.innerHTML = 'Updating...';
+
+    try {
+        const response = await fetch(`${API_BASE}/api/update/perform`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ download_url: updateDownloadUrl })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            statusText.textContent = 'Updating...';
+            showToast('Update Started', 'The server is updating and will restart shortly. Please reload this page in a minute.', 'success');
+
+            // Disable UI
+            document.body.style.opacity = '0.5';
+            document.body.style.pointerEvents = 'none';
+
+            // Try to reload after 15 seconds
+            setTimeout(() => {
+                location.reload();
+            }, 15000);
+        } else {
+            throw new Error(data.error);
+        }
+    } catch (error) {
+        console.error('Update error:', error);
+        statusText.textContent = 'Update failed';
+        showToast('Update Failed', error.message, 'error');
+        updateBtn.disabled = false;
+        updateBtn.innerHTML = 'Update Now';
+    }
+}
+
+// Expose to window for onclick handlers
+window.checkForUpdates = checkForUpdates;
+window.performUpdate = performUpdate;
+

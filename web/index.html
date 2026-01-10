@@ -59,6 +59,15 @@
                         </svg>
                         Backups
                     </button>
+                    <button class="btn btn-secondary" id="headerUpdatesBtn" title="Check for Updates">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M1 20v-6h6"></path>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Updates
+                    </button>
                     <button class="btn btn-primary" id="saveBtn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -115,37 +124,23 @@
                     </button>
                 </div>
             </div>
+            <!-- Screens Bar (Sub-header) -->
+            <div class="screens-bar">
+                <div id="screensList" class="screens-tabs">
+                    <!-- Tabs rendered here -->
+                </div>
+                <button class="btn-icon-small" id="addScreenBtn" title="Add Screen">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                </button>
+            </div>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Global Settings</h3>
-                    <div class="setting-item">
-                        <label class="toggle-label">
-                            <input type="checkbox" id="disableAutorotation" class="toggle-input">
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-text">Disable Auto-rotation</span>
-                        </label>
-                    </div>
-                </div>
 
-                <div class="sidebar-section">
-                    <div class="sidebar-header">
-                        <h3 class="sidebar-title">Screens</h3>
-                        <button class="btn-icon" id="addScreenBtn" title="Add Screen">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19" />
-                                <line x1="5" y1="12" x2="19" y2="12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="screensList" class="screens-list"></div>
-                </div>
-            </aside>
 
             <!-- Content Area -->
             <div class="content-area">
@@ -202,34 +197,41 @@
                     </div>
 
                     <!-- Screen Settings -->
-                    <div class="settings-panel">
-                        <h3 class="panel-title">Screen Settings</h3>
-                        <div class="settings-grid">
-                            <div class="form-group">
-                                <label for="screenDuration">Duration (seconds)</label>
-                                <input type="number" id="screenDuration" class="form-input" placeholder="30" min="1">
-                                <span class="form-hint">How long this screen will be shown each rotation</span>
+                    <div class="settings-panel compact-panel">
+                        <div class="panel-header compact-header">
+                            <h3 class="panel-title">Screen Settings</h3>
+                        </div>
+                        <div class="settings-grid compact-grid">
+                            <div class="form-group compact-group">
+                                <label for="screenDuration">Duration (sec)</label>
+                                <input type="number" id="screenDuration" class="form-input compact-input"
+                                    placeholder="30" min="1">
                             </div>
-                            <div class="form-group">
-                                <label for="screenColumns">Number of Columns</label>
-                                <input type="number" id="screenColumns" class="form-input" placeholder="2" min="1">
-                                <span class="form-hint">Grid layout columns</span>
+                            <div class="form-group compact-group">
+                                <label for="screenColumns">Columns</label>
+                                <input type="number" id="screenColumns" class="form-input compact-input" placeholder="2"
+                                    min="1">
                             </div>
-                            <div class="form-group">
-                                <label class="toggle-label">
+                            <div class="form-group compact-group checkbox-group">
+                                <label class="toggle-label compact-toggle">
                                     <input type="checkbox" id="screenRotate90" class="toggle-input">
-                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-slider compact-slider"></span>
                                     <span class="toggle-text">Rotate 90°</span>
                                 </label>
-                                <span class="form-hint">For vertical monitors</span>
                             </div>
-                            <div class="form-group">
-                                <label class="toggle-label">
+                            <div class="form-group compact-group checkbox-group">
+                                <label class="toggle-label compact-toggle">
                                     <input type="checkbox" id="screenDisableProbing" class="toggle-input">
-                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-slider compact-slider"></span>
                                     <span class="toggle-text">Disable Probing</span>
                                 </label>
-                                <span class="form-hint">Disable stream health checks</span>
+                            </div>
+                            <div class="form-group compact-group checkbox-group">
+                                <label class="toggle-label compact-toggle">
+                                    <input type="checkbox" id="disableAutorotation" class="toggle-input">
+                                    <span class="toggle-slider compact-slider"></span>
+                                    <span class="toggle-text">Disable Auto-rotation (Global)</span>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -486,6 +488,29 @@
                             <span style="font-size: var(--font-size-xs); color: var(--text-muted); line-height: 1.4;">
                                 ⚠️ Changing the port will require you to refresh or manually navigate to the new URL.
                             </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-section"
+                    style="margin-top: var(--spacing-lg); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                    <h3 style="font-size: var(--font-size-base); color: var(--text-primary);">Update Manager</h3>
+                    <div id="updateStatusContainer" style="margin-top: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div id="updateStatusText" style="font-weight: 500; font-size: var(--font-size-sm);">
+                                    Checking for updates...</div>
+                                <div id="updateStatusSubtext"
+                                    style="font-size: var(--font-size-xs); color: var(--text-muted);">Current Version:
+                                    <span id="currentVersionDisplay">1.2</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="checkForUpdatesBtn" onclick="checkForUpdates()">Check
+                                Now</button>
+                            <button class="btn btn-success" id="performUpdateBtn" onclick="performUpdate()"
+                                style="display: none;">Update Now</button>
+                        </div>
+                        <div id="updateReleaseNotes"
+                            style="display: none; margin-top: 10px; background: var(--bg-secondary); padding: 10px; border-radius: 4px; font-size: var(--font-size-xs); white-space: pre-wrap; max-height: 100px; overflow-y: auto;">
                         </div>
                     </div>
                 </div>

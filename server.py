@@ -10,8 +10,15 @@ import os
 import shutil
 import json
 from datetime import datetime
+import time
+from updater import GitHubUpdater
 
-PROGRAM_NAME = "Tonys OpenSurv Manager 1.2"
+
+VERSION = "1.2"
+PROGRAM_NAME = f"Tonys OpenSurv Manager {VERSION}"
+REPO_OWNER = "BigTonyTones"
+REPO_NAME = "Tonys-OpenSurv-Gui-Editor"
+
 
 def check_root():
     """Check if the program is running with root privileges on Linux"""
@@ -142,7 +149,9 @@ except ImportError as e:
     sys.exit(1)
 
 app = Flask(__name__, static_folder='web')
+app = Flask(__name__, static_folder='web')
 CORS(app)
+updater = GitHubUpdater(REPO_OWNER, REPO_NAME, VERSION)
 
 # Configuration
 # Configuration
@@ -378,7 +387,51 @@ def check_screenshots():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+@app.route('/api/update/check', methods=['GET'])
+def check_update():
+    result = updater.check_for_updates()
+    return jsonify(result)
+
+@app.route('/api/update/perform', methods=['POST'])
+def perform_update():
+    try:
+        data = request.get_json()
+        download_url = data.get('download_url')
+        
+        if not download_url:
+            return jsonify({'success': False, 'error': 'No download URL provided'}), 400
+            
+        # Download
+        zip_path = "update.zip"
+        if updater.download_update(download_url, zip_path):
+            # Create script
+            script_path = updater.create_update_script(zip_path)
+            
+            # Launch script and exit
+            if os.name == 'nt':
+                # Windows: start a new command prompt to run the batch file
+                subprocess.Popen(['start', 'cmd', '/c', script_path], shell=True)
+            else:
+                # Linux: run shell script in background
+                subprocess.Popen(['/bin/bash', script_path], start_new_session=True)
+                
+            # Exit server shortly after
+            def exit_server():
+                time.sleep(1)
+                os._exit(0)
+                
+            from threading import Thread
+            Thread(target=exit_server).start()
+            
+            return jsonify({'success': True, 'message': 'Update started. Server is restarting...'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to download update'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/backups', methods=['GET'])
+
 def list_backups():
     try:
         backups = []
