@@ -261,6 +261,34 @@ function showToast(title, message, type = 'info') {
     }, 3000);
 }
 
+// ===== Clipboard Utility =====
+async function copyToClipboard(text, btnElement) {
+    try {
+        await navigator.clipboard.writeText(text);
+
+        // Visual feedback
+        const originalText = btnElement.innerHTML;
+        const originalClass = btnElement.className;
+
+        btnElement.classList.add('copied');
+        btnElement.innerHTML = `
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:4px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Copied
+        `;
+
+        setTimeout(() => {
+            btnElement.className = originalClass;
+            btnElement.innerHTML = originalText;
+        }, 2000);
+
+    } catch (err) {
+        console.error('Failed to copy text: ', err);
+        showToast('Error', 'Failed to copy to clipboard', 'error');
+    }
+}
+
 // ===== UI Rendering =====
 function renderScreensList() {
     const screensList = document.getElementById('screensList');
@@ -322,18 +350,13 @@ function renderCamerasList() {
 
             // Use camera name if available, otherwise show URL
             const displayName = stream.name || 'Camera ' + (index + 1);
-            const displayUrl = stream.name ? stream.url : '';
+            const urlToDisplay = stream.name ? stream.url : (stream.url || 'No URL');
             const screenshot = state.screenshots && state.screenshots[stream.url] ? state.screenshots[stream.url] : null;
 
             card.innerHTML = `
                 ${screenshot ? `<img src="/screenshots/${screenshot}" class="camera-preview" alt="${displayName}">` : ''}
                 <div class="camera-header">
-                    <div class="camera-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                            <circle cx="12" cy="13" r="4"/>
-                        </svg>
-                    </div>
+                    <div class="camera-name" style="margin: 0; font-size: 1.1rem;">${displayName}</div>
                     <div class="camera-actions">
                         <button class="camera-action-btn play" data-index="${index}" title="Play in VLC">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -349,13 +372,19 @@ function renderCamerasList() {
                         <button class="camera-action-btn delete" data-index="${index}" title="Delete">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2-2v2"/>
                             </svg>
                         </button>
                     </div>
                 </div>
-                <div class="camera-name">${displayName}</div>
-                ${displayUrl ? `<div class="camera-url">${displayUrl}</div>` : `<div class="camera-url">${stream.url || 'No URL'}</div>`}
+                <div class="url-badge-container">
+                    <div class="url-badge">
+                        <span class="url-text" title="${urlToDisplay}">${urlToDisplay}</span>
+                        <button class="copy-url-btn" onclick="copyToClipboard('${urlToDisplay}', this)">
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="camera-details">
                     ${badges.join('')}
                 </div>

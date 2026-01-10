@@ -727,12 +727,60 @@ body {
     border-color: var(--success-color);
 }
 
-.camera-url {
-    font-size: var(--font-size-sm);
-    color: var(--text-primary);
-    font-weight: 500;
+/* .camera-url replaced by url-badge system */
+.url-badge-container {
+    display: flex;
+    align-items: center;
     margin-bottom: var(--spacing-sm);
-    word-break: break-all;
+    max-width: 100%;
+}
+
+.url-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(124, 58, 237, 0.1);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 12px;
+    padding: 2px;
+    padding-left: 10px;
+    max-width: 100%;
+}
+
+.url-text {
+    font-size: var(--font-size-xs);
+    color: #a78bfa;
+    /* Purple-ish text */
+    font-family: monospace;
+    margin-right: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.copy-url-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #7c3aed;
+    /* Purple */
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 24px;
+}
+
+.copy-url-btn:hover {
+    background: #6d28d9;
+}
+
+.copy-url-btn.copied {
+    background: var(--success-color);
+    /* Green */
 }
 
 .camera-name {
