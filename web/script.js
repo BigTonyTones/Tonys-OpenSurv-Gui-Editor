@@ -1505,3 +1505,78 @@ async function performUpdate() {
 window.checkForUpdates = checkForUpdates;
 window.performUpdate = performUpdate;
 
+// ===== Raw Editor =====
+const rawEditorModal = document.getElementById('rawEditorModal');
+const rawEditorBtn = document.getElementById('rawEditorBtn');
+const rawEditorClose = document.getElementById('rawEditorModalClose');
+const rawEditorCancel = document.getElementById('rawEditorCancel');
+const rawEditorSave = document.getElementById('rawEditorSave');
+const rawEditorContent = document.getElementById('rawEditorContent');
+
+async function openRawEditor() {
+    rawEditorModal.classList.add('active');
+    rawEditorContent.value = 'Loading configuration...';
+    rawEditorContent.disabled = true;
+
+    try {
+        const response = await fetch(`${API_BASE}/api/config`);
+        const data = await response.json();
+
+        if (data.success) {
+            rawEditorContent.value = data.content;
+            rawEditorContent.disabled = false;
+        } else {
+            rawEditorContent.value = `Error loading config: ${data.error}`;
+        }
+    } catch (error) {
+        console.error('Error fetching raw config:', error);
+        rawEditorContent.value = `Failed to connect to server: ${error.message}`;
+    }
+}
+
+function closeRawEditor() {
+    rawEditorModal.classList.remove('active');
+}
+
+async function saveRawFile() {
+    if (!confirm('WARNING: Saving raw configuration will overwrite existing settings. Syntax errors may prevent the server from starting. Are you sure?')) {
+        return;
+    }
+
+    const content = rawEditorContent.value;
+    const saveBtn = document.getElementById('rawEditorSave');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = 'Saving...';
+
+    try {
+        const response = await fetch(`${API_BASE}/api/config`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast('Success', 'Configuration saved successfully', 'success');
+            closeRawEditor();
+            // Reload main config to update UI
+            loadConfig();
+        } else {
+            showToast('Error', data.error || 'Failed to save configuration', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving raw config:', error);
+        showToast('Error', 'Failed to connect to server', 'error');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = 'Save Changes';
+    }
+}
+
+if (rawEditorBtn) rawEditorBtn.addEventListener('click', openRawEditor);
+if (rawEditorClose) rawEditorClose.addEventListener('click', closeRawEditor);
+if (rawEditorCancel) rawEditorCancel.addEventListener('click', closeRawEditor);
+if (rawEditorSave) rawEditorSave.addEventListener('click', saveRawFile);
+
+
