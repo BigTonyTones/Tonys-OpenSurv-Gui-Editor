@@ -239,6 +239,17 @@ function selectPreviewCamera(index) {
         if (parseInt(cam.dataset.index) === index) {
             cam.style.zIndex = '100';
             cam.style.boxShadow = '0 0 0 3px var(--primary-color), 0 0 20px rgba(102, 126, 234, 0.5)';
+
+            // Show and update manual entry section
+            const manualSection = document.getElementById('manualEntrySection');
+            const coords = JSON.parse(cam.dataset.coords || '[0,0,0,0]');
+            if (manualSection) {
+                manualSection.style.display = 'block';
+                document.getElementById('manualX').value = coords[0];
+                document.getElementById('manualY').value = coords[1];
+                document.getElementById('manualWidth').value = coords[2] - coords[0];
+                document.getElementById('manualHeight').value = coords[3] - coords[1];
+            }
         } else {
             cam.style.zIndex = cam.classList.contains('show-on-top') ? '5' : '1';
             cam.style.boxShadow = 'none';
@@ -468,6 +479,16 @@ document.addEventListener('keydown', (e) => {
 
         previewState.hasChanges = true;
         updatePreviewSaveButton();
+
+        // Update manual inputs
+        const manualX = document.getElementById('manualX');
+        const manualY = document.getElementById('manualY');
+        const manualW = document.getElementById('manualWidth');
+        const manualH = document.getElementById('manualHeight');
+        if (manualX) manualX.value = x1;
+        if (manualY) manualY.value = y1;
+        if (manualW) manualW.value = width;
+        if (manualH) manualH.value = height;
     }
 });
 
@@ -496,6 +517,15 @@ function updateCameraCoords(cameraDiv, canvasRect) {
     }
 
     cameraDiv.dataset.coords = JSON.stringify([x1, y1, x2, y2]);
+
+    // Update manual inputs if this is the selected camera
+    if (previewState.selectedCamera === index) {
+        document.getElementById('manualX').value = x1;
+        document.getElementById('manualY').value = y1;
+        document.getElementById('manualWidth').value = width;
+        document.getElementById('manualHeight').value = height;
+    }
+
     updatePreviewInfo();
 }
 
@@ -546,6 +576,9 @@ window.closePreviewModalDraggable = function () {
         state.config.essentials.screens[state.currentScreenIndex].streams.forEach(s => delete s._previewCoords);
     }
     document.querySelectorAll('.snap-guide').forEach(g => g.remove());
+    const manualSection = document.getElementById('manualEntrySection');
+    if (manualSection) manualSection.style.display = 'none';
+
     document.getElementById('previewModal').classList.remove('active');
     previewState.hasChanges = false;
     previewState.selectedCamera = null;
@@ -596,6 +629,60 @@ function initPreviewControls() {
     toggleGrid.addEventListener('change', () => {
         if (toggleGrid.checked) grid.classList.add('active');
         else grid.classList.remove('active');
+    });
+
+    // Manual Entry Listeners
+    const manualX = document.getElementById('manualX');
+    const manualY = document.getElementById('manualY');
+    const manualW = document.getElementById('manualWidth');
+    const manualH = document.getElementById('manualHeight');
+
+    const handleManualChange = () => {
+        if (previewState.selectedCamera === null) return;
+        const camDiv = document.querySelector(`.preview-camera[data-index="${previewState.selectedCamera}"]`);
+        if (!camDiv) return;
+
+        const x = parseInt(manualX.value) || 0;
+        const y = parseInt(manualY.value) || 0;
+        const w = parseInt(manualW.value) || 100;
+        const h = parseInt(manualH.value) || 100;
+
+        const x1 = Math.max(0, Math.min(x, previewState.screenWidth - 10));
+        const y1 = Math.max(0, Math.min(y, previewState.screenHeight - 10));
+        const x2 = Math.max(x1 + 10, Math.min(x1 + w, previewState.screenWidth));
+        const y2 = Math.max(y1 + 10, Math.min(y1 + h, previewState.screenHeight));
+
+        const width = x2 - x1;
+        const height = y2 - y1;
+
+        // Update DOM Style (Percentages)
+        camDiv.style.left = `${(x1 / previewState.screenWidth) * 100}%`;
+        camDiv.style.top = `${(y1 / previewState.screenHeight) * 100}%`;
+        camDiv.style.width = `${(width / previewState.screenWidth) * 100}%`;
+        camDiv.style.height = `${(height / previewState.screenHeight) * 100}%`;
+
+        // Update Dataset
+        camDiv.dataset.coords = JSON.stringify([x1, y1, x2, y2]);
+
+        // Update Visuals
+        const coordsElements = camDiv.querySelectorAll('.preview-camera-coords');
+        if (coordsElements.length >= 2) {
+            coordsElements[0].textContent = `${width}x${height}px`;
+            coordsElements[1].textContent = `[${x1}, ${y1}, ${x2}, ${y2}]`;
+        }
+
+        const listItem = document.querySelector(`.preview-camera-item[data-index="${previewState.selectedCamera}"]`);
+        if (listItem) {
+            const info = listItem.querySelector('.preview-camera-item-info');
+            if (info) info.textContent = `${width}x${height}px • [${x1}, ${y1}, ${x2}, ${y2}]`;
+        }
+
+        previewState.hasChanges = true;
+        updatePreviewSaveButton();
+    };
+
+    [manualX, manualY, manualW, manualH].forEach(el => {
+        if (el) el.addEventListener('input', handleManualChange);
     });
 }
 

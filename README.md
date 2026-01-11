@@ -1,4 +1,4 @@
-# Tonys OpenSurv Manager 1.2
+# Tonys OpenSurv Manager 1.4
 
 This is a GUI tool I made to help manage Opensurv YML config files. It's built for Linux but works on Windows too if you just want to edit files.
 

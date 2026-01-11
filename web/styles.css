@@ -1467,3 +1467,20 @@ body {
 .preview-camera.has-image {
     background-color: #000;
 }
+
+.form-input-compact {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: monospace;
+    transition: all 0.2s;
+}
+
+.form-input-compact:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+}
