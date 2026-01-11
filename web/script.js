@@ -107,7 +107,8 @@ const YAMLParser = {
                             probe_timeout: null,
                             timeout_waiting_for_init_stream: null,
                             freeform_advanced_mpv_options: null,
-                            force_coordinates: null
+                            force_coordinates: null,
+                            disabled: false
                         };
                         currentScreen.streams.push(currentStream);
                         lastComment = null; // Reset after using
@@ -117,7 +118,10 @@ const YAMLParser = {
 
                 // Stream properties
                 if (currentStream) {
-                    if (trimmed.startsWith('imageurl:')) {
+                    if (trimmed.startsWith('disabled:')) {
+                        const value = trimmed.split(':')[1].trim();
+                        currentStream.disabled = value === 'True' || value === 'true';
+                    } else if (trimmed.startsWith('imageurl:')) {
                         const value = trimmed.split(':')[1].trim();
                         currentStream.imageurl = value === 'true' || value === 'True';
                     } else if (trimmed.startsWith('showontop:')) {
@@ -208,6 +212,10 @@ const YAMLParser = {
 
                 if (stream.freeform_advanced_mpv_options) {
                     yaml += `          freeform_advanced_mpv_options: "${stream.freeform_advanced_mpv_options}"\n`;
+                }
+
+                if (stream.disabled) {
+                    yaml += `          disabled: True\n`;
                 }
             });
 
@@ -359,7 +367,7 @@ function renderCamerasList() {
     screen.streams.forEach((stream, index) => {
         try {
             const card = document.createElement('div');
-            card.className = 'camera-card';
+            card.className = `camera-card ${stream.disabled ? 'disabled' : ''}`;
 
             const badges = [];
             if (stream.imageurl) badges.push('<span class="camera-badge active">Image URL</span>');
@@ -377,6 +385,7 @@ function renderCamerasList() {
             }
 
             if (stream.probe_timeout) badges.push(`<span class="camera-badge">Timeout: ${stream.probe_timeout}s</span>`);
+            if (stream.disabled) badges.push('<span class="camera-badge danger">Disabled</span>');
 
             // Use camera name if available, otherwise show URL
             const displayName = stream.name || 'Camera ' + (index + 1);
@@ -558,6 +567,7 @@ function openCameraModal(mode = 'add', cameraIndex = null) {
     document.getElementById('coordX2').value = '';
     document.getElementById('coordY2').value = '';
     document.getElementById('coordsSection').style.display = 'none';
+    document.getElementById('cameraEnabled').checked = true;
 
     // If editing, populate form
     if (mode === 'edit' && cameraIndex !== null) {
@@ -581,6 +591,8 @@ function openCameraModal(mode = 'add', cameraIndex = null) {
             document.getElementById('coordX2').value = camera.force_coordinates[2];
             document.getElementById('coordY2').value = camera.force_coordinates[3];
         }
+
+        document.getElementById('cameraEnabled').checked = camera.disabled === true ? false : true;
     }
 
     modal.classList.add('active');
@@ -609,7 +621,8 @@ function saveCamera() {
         probe_timeout: parseInt(document.getElementById('cameraProbeTimeout').value) || null,
         timeout_waiting_for_init_stream: parseInt(document.getElementById('cameraInitTimeout').value) || null,
         freeform_advanced_mpv_options: document.getElementById('cameraMpvOptions').value.trim() || null,
-        force_coordinates: null
+        force_coordinates: null,
+        disabled: !document.getElementById('cameraEnabled').checked
     };
 
     if (document.getElementById('cameraForceCoords').checked) {

@@ -106,7 +106,7 @@ window.showScreenPreviewDraggable = function () {
 
         // Create camera list item
         const listItem = document.createElement('div');
-        listItem.className = 'preview-camera-item';
+        listItem.className = `preview-camera-item ${stream.disabled ? 'disabled' : ''}`;
         listItem.dataset.index = index;
         listItem.innerHTML = `
             <div class="preview-camera-item-name">${displayName}</div>
@@ -117,7 +117,9 @@ window.showScreenPreviewDraggable = function () {
 
         // Create camera box on canvas
         const cameraDiv = document.createElement('div');
-        cameraDiv.className = 'preview-camera' + (stream.showontop ? ' show-on-top' : '');
+        cameraDiv.className = 'preview-camera' +
+            (stream.showontop ? ' show-on-top' : '') +
+            (stream.disabled ? ' disabled' : '');
         cameraDiv.style.left = `${(x1 / previewState.screenWidth) * 100}%`;
         cameraDiv.style.top = `${(y1 / previewState.screenHeight) * 100}%`;
         cameraDiv.style.width = `${(width / previewState.screenWidth) * 100}%`;

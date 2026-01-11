@@ -650,6 +650,29 @@ body {
     overflow: hidden;
 }
 
+.camera-card.disabled {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: auto;
+    /* Allow editing even if disabled */
+}
+
+.camera-card.disabled::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(45deg,
+            rgba(0, 0, 0, 0.02),
+            rgba(0, 0, 0, 0.02) 10px,
+            rgba(0, 0, 0, 0.05) 10px,
+            rgba(0, 0, 0, 0.05) 20px);
+    pointer-events: none;
+}
+
 .camera-card::before {
     content: '';
     position: absolute;
@@ -811,6 +834,12 @@ body {
 
 .camera-badge.active {
     background: var(--success-color);
+    color: white;
+    border-color: transparent;
+}
+
+.camera-badge.danger {
+    background: var(--danger-color);
     color: white;
     border-color: transparent;
 }
@@ -1010,7 +1039,7 @@ body {
     flex-direction: column;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    z-index: 50;
+    z-index: 500;
 }
 
 .preview-sidebar-title {
@@ -1061,6 +1090,19 @@ body {
 .preview-camera-item-info {
     font-size: var(--font-size-xs);
     color: var(--text-muted);
+}
+
+.preview-camera-item.disabled {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.preview-camera-item.disabled .preview-camera-item-name::after {
+    content: ' (Disabled)';
+    color: var(--danger-color);
+    font-size: 10px;
+    font-weight: normal;
 }
 
 .preview-help {
@@ -1191,6 +1233,18 @@ body {
 .preview-camera.show-on-top {
     border-color: var(--warning-color);
     z-index: 5;
+}
+
+.preview-camera.disabled {
+    opacity: 0.3;
+    border-color: var(--text-muted);
+    filter: grayscale(1);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.preview-camera.disabled .preview-camera-name {
+    background: var(--danger-color);
+    color: white;
 }
 
 .preview-camera-name {
@@ -1483,4 +1537,21 @@ body {
     outline: none;
     border-color: var(--primary-color);
     background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-accent {
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+.btn-accent:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+}
+
+.btn-accent:active {
+    transform: translateY(0);
 }
