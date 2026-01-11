@@ -251,6 +251,7 @@ function selectPreviewCamera(index) {
                 document.getElementById('manualY').value = coords[1];
                 document.getElementById('manualWidth').value = coords[2] - coords[0];
                 document.getElementById('manualHeight').value = coords[3] - coords[1];
+                document.getElementById('manualShowOnTop').checked = cam.classList.contains('show-on-top');
             }
         } else {
             cam.style.zIndex = cam.classList.contains('show-on-top') ? '5' : '1';
@@ -562,6 +563,7 @@ window.applyPreviewChanges = function () {
         const index = parseInt(cameraDiv.dataset.index);
         const coords = JSON.parse(cameraDiv.dataset.coords || '[]');
         if (coords.length === 4) screen.streams[index].force_coordinates = coords;
+        screen.streams[index].showontop = cameraDiv.classList.contains('show-on-top');
     });
 
     state.resolution = { width: previewState.screenWidth, height: previewState.screenHeight };
@@ -638,6 +640,7 @@ function initPreviewControls() {
     const manualY = document.getElementById('manualY');
     const manualW = document.getElementById('manualWidth');
     const manualH = document.getElementById('manualHeight');
+    const manualTop = document.getElementById('manualShowOnTop');
 
     const handleManualChange = () => {
         if (previewState.selectedCamera === null) return;
@@ -686,6 +689,25 @@ function initPreviewControls() {
     [manualX, manualY, manualW, manualH].forEach(el => {
         if (el) el.addEventListener('input', handleManualChange);
     });
+
+    if (manualTop) {
+        manualTop.addEventListener('change', () => {
+            if (previewState.selectedCamera === null) return;
+            const camDiv = document.querySelector(`.preview-camera[data-index="${previewState.selectedCamera}"]`);
+            if (!camDiv) return;
+
+            if (manualTop.checked) {
+                camDiv.classList.add('show-on-top');
+                camDiv.style.borderColor = 'var(--warning-color)';
+            } else {
+                camDiv.classList.remove('show-on-top');
+                camDiv.style.borderColor = 'var(--primary-color)';
+            }
+
+            previewState.hasChanges = true;
+            updatePreviewSaveButton();
+        });
+    }
 }
 
 // Re-initialize controls when modal is shown 
