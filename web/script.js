@@ -40,6 +40,68 @@ const YAMLParser = {
                 // Skip empty lines
                 if (trimmed === '') continue;
 
+                // SPECIAL HANDLING FOR DISABLED (COMMENTED) STREAMS
+                if (trimmed.startsWith('#')) {
+                    const content = trimmed.substring(1).trim();
+                    let handledAsDisabled = false;
+
+                    // Case 1: Commented out URL (Start of disabled stream)
+                    if (currentScreen && content.startsWith('- url:')) {
+                        const urlMatch = content.match(/- url:\s*"([^"]+)"/);
+                        if (urlMatch) {
+                            currentStream = {
+                                name: lastComment || null, // Use pending comment as name
+                                url: urlMatch[1],
+                                imageurl: null,
+                                showontop: null,
+                                enableaudio: null,
+                                probe_timeout: null,
+                                timeout_waiting_for_init_stream: null,
+                                freeform_advanced_mpv_options: null,
+                                force_coordinates: null,
+                                disabled: true
+                            };
+                            currentScreen.streams.push(currentStream);
+                            lastComment = null;
+                            handledAsDisabled = true;
+                        }
+                    }
+                    // Case 2: Property of disabled stream
+                    else if (currentStream && currentStream.disabled) {
+                        if (content.startsWith('imageurl:')) {
+                            const value = content.split(':')[1].trim();
+                            currentStream.imageurl = value === 'true' || value === 'True';
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('showontop:')) {
+                            const value = content.split(':')[1].trim();
+                            currentStream.showontop = value === 'True' || value === 'true';
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('enableaudio:')) {
+                            const value = content.split(':')[1].trim();
+                            currentStream.enableaudio = value === 'True' || value === 'true';
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('probe_timeout:')) {
+                            currentStream.probe_timeout = parseInt(content.split(':')[1].trim());
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('timeout_waiting_for_init_stream:')) {
+                            currentStream.timeout_waiting_for_init_stream = parseInt(content.split(':')[1].trim());
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('freeform_advanced_mpv_options:')) {
+                            const value = content.match(/"([^"]+)"/);
+                            if (value) currentStream.freeform_advanced_mpv_options = value[1];
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('force_coordinates:')) {
+                            const coordsMatch = content.match(/\[([\d,\s]+)\]/);
+                            if (coordsMatch) {
+                                currentStream.force_coordinates = coordsMatch[1].split(',').map(n => parseInt(n.trim()));
+                            }
+                            handledAsDisabled = true;
+                        }
+                    }
+
+                    if (handledAsDisabled) continue;
+                }
+
                 // Capture comments that might be camera names or resolution info
                 if (trimmed.startsWith('#') && !trimmed.includes('###')) {
                     const commentText = trimmed.substring(1).trim();
@@ -94,7 +156,7 @@ const YAMLParser = {
                     continue;
                 }
 
-                // New stream
+                // New stream (Active)
                 if (currentScreen && trimmed.startsWith('- url:')) {
                     const urlMatch = trimmed.match(/- url:\s*"([^"]+)"/);
                     if (urlMatch) {
@@ -184,39 +246,47 @@ const YAMLParser = {
                     yaml += `#${stream.name}\n`;
                 }
 
-                yaml += `        - url: "${stream.url}"\n`;
+                // Build the stream block
+                let sb = '';
+                sb += `        - url: "${stream.url}"\n`;
 
                 if (stream.imageurl !== null && stream.imageurl !== undefined) {
-                    yaml += `          imageurl: ${stream.imageurl ? 'true' : 'false'}\n`;
+                    sb += `          imageurl: ${stream.imageurl ? 'true' : 'false'}\n`;
                 }
 
                 if (stream.force_coordinates && stream.force_coordinates.length === 4) {
-                    yaml += `          force_coordinates: [${stream.force_coordinates.join(', ')}]\n`;
+                    sb += `          force_coordinates: [${stream.force_coordinates.join(', ')}]\n`;
                 }
 
                 if (stream.showontop !== null && stream.showontop !== undefined) {
-                    yaml += `          showontop: ${stream.showontop ? 'True' : 'False'}\n`;
+                    sb += `          showontop: ${stream.showontop ? 'True' : 'False'}\n`;
                 }
 
                 if (stream.enableaudio !== null && stream.enableaudio !== undefined) {
-                    yaml += `          enableaudio: ${stream.enableaudio ? 'True' : 'False'}\n`;
+                    sb += `          enableaudio: ${stream.enableaudio ? 'True' : 'False'}\n`;
                 }
 
                 if (stream.probe_timeout) {
-                    yaml += `          probe_timeout: ${stream.probe_timeout}\n`;
+                    sb += `          probe_timeout: ${stream.probe_timeout}\n`;
                 }
 
                 if (stream.timeout_waiting_for_init_stream) {
-                    yaml += `          timeout_waiting_for_init_stream: ${stream.timeout_waiting_for_init_stream}\n`;
+                    sb += `          timeout_waiting_for_init_stream: ${stream.timeout_waiting_for_init_stream}\n`;
                 }
 
                 if (stream.freeform_advanced_mpv_options) {
-                    yaml += `          freeform_advanced_mpv_options: "${stream.freeform_advanced_mpv_options}"\n`;
+                    sb += `          freeform_advanced_mpv_options: "${stream.freeform_advanced_mpv_options}"\n`;
                 }
 
+                // If disabled, comment out every line in the block
                 if (stream.disabled) {
-                    yaml += `          disabled: True\n`;
+                    sb = sb.split('\n').map(line => {
+                        if (line.trim().length === 0) return line;
+                        return '#' + line;
+                    }).join('\n');
                 }
+
+                yaml += sb;
             });
 
             // Screen-level properties
