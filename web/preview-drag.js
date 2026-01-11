@@ -572,6 +572,7 @@ window.applyPreviewChanges = function () {
     updatePreviewInfo();
     updatePreviewSaveButton();
     renderCamerasList();
+    markAsChanged();
     showToast('Changes Applied', 'Layout positions and resolution updated. Save Config to persist.', 'success');
 };
 

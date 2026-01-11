@@ -11,7 +11,8 @@ const state = {
     currentCameraIndex: null,
     currentFilePath: '/etc/opensurv/monitor1.yml', // Default for display
     editMode: 'add', // 'add' or 'edit'
-    screenshots: {} // url -> filename mapping
+    screenshots: {}, // url -> filename mapping
+    hasUnsavedChanges: false
 };
 
 // ===== YAML Parser (Simple Implementation) =====
@@ -354,6 +355,30 @@ function showToast(title, message, type = 'info') {
     }, 3000);
 }
 
+// ===== Change Tracking =====
+function markAsChanged() {
+    state.hasUnsavedChanges = true;
+    promptToSave();
+}
+
+function promptToSave() {
+    if (!state.hasUnsavedChanges) return;
+
+    const notification = document.getElementById('unsavedNotification');
+    if (notification) {
+        notification.classList.add('show');
+    }
+}
+
+function clearChangedFlag() {
+    state.hasUnsavedChanges = false;
+    const notification = document.getElementById('unsavedNotification');
+    if (notification) {
+        notification.classList.remove('show');
+    }
+}
+
+
 // ===== Clipboard Utility =====
 // ===== Clipboard Utility =====
 async function copyToClipboard(text, btnElement) {
@@ -482,6 +507,10 @@ function renderCamerasList() {
                 <div class="camera-header">
                     <div class="camera-name" style="margin: 0; font-size: 1.1rem;">${displayName}</div>
                     <div class="camera-actions">
+                        <label class="toggle-label compact-toggle" style="margin: 0 8px 0 0;" title="Enable/Disable Camera">
+                            <input type="checkbox" class="toggle-input camera-enable-toggle" data-index="${index}" ${!stream.disabled ? 'checked' : ''}>
+                            <span class="toggle-slider compact-slider" style="width: 32px; height: 18px;"></span>
+                        </label>
                         <button class="camera-action-btn play" data-index="${index}" title="Play in VLC">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="5 3 19 12 5 21 5 3"/>
@@ -537,6 +566,18 @@ function renderCamerasList() {
     document.querySelectorAll('.camera-action-btn.delete').forEach(btn => {
         btn.addEventListener('click', () => deleteCamera(parseInt(btn.dataset.index)));
     });
+
+    // Add event listener for enable/disable toggles
+    document.querySelectorAll('.camera-enable-toggle').forEach(toggle => {
+        toggle.addEventListener('change', (e) => {
+            const index = parseInt(toggle.dataset.index);
+            const screen = state.config.essentials.screens[state.currentScreenIndex];
+            screen.streams[index].disabled = !e.target.checked;
+            markAsChanged();
+            renderCamerasList();
+            showToast('Camera Updated', `Camera ${screen.streams[index].name || index + 1} ${e.target.checked ? 'enabled' : 'disabled'}`, 'success');
+        });
+    });
 }
 
 function selectScreen(index) {
@@ -586,6 +627,7 @@ function addScreen() {
     state.config.essentials.screens.push(newScreen);
     state.currentScreenIndex = state.config.essentials.screens.length - 1;
 
+    markAsChanged();
     renderScreensList();
     renderScreenEditor();
     renderCamerasList();
@@ -605,6 +647,7 @@ function deleteScreen() {
             state.currentScreenIndex = state.config.essentials.screens.length - 1;
         }
 
+        markAsChanged();
         renderScreensList();
         renderScreenEditor();
         renderCamerasList();
@@ -731,6 +774,7 @@ function saveCamera() {
         showToast('Camera Updated', 'Camera updated successfully', 'success');
     }
 
+    markAsChanged();
     closeCameraModal();
     renderCamerasList();
     renderScreensList();
@@ -773,6 +817,7 @@ function deleteCamera(index) {
     if (confirm('Are you sure you want to delete this camera?')) {
         const screen = state.config.essentials.screens[state.currentScreenIndex];
         screen.streams.splice(index, 1);
+        markAsChanged();
         renderCamerasList();
         renderScreensList();
         showToast('Camera Deleted', 'Camera removed successfully', 'success');
@@ -1161,6 +1206,7 @@ async function saveConfig() {
         const data = await response.json();
 
         if (data.success) {
+            clearChangedFlag();
             showToast('Config Saved', 'Configuration saved successfully (backup created)', 'success');
         } else {
             throw new Error(data.error || 'Failed to save configuration');

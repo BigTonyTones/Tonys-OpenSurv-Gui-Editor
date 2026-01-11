@@ -15,7 +15,7 @@ import logging
 from updater import GitHubUpdater
 
 
-VERSION = "1.4.8"
+VERSION = "1.5"
 PROGRAM_NAME = f"Tonys OpenSurv Manager {VERSION}"
 REPO_OWNER = "BigTonyTones"
 REPO_NAME = "Tonys-OpenSurv-Gui-Editor"

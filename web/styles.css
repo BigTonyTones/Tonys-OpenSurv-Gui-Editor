@@ -951,14 +951,19 @@ body {
 }
 
 /* ===== Toast Notifications ===== */
-.toast-container {
+#toastContainer {
     position: fixed;
-    bottom: var(--spacing-xl);
-    right: var(--spacing-xl);
-    z-index: 2000;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    pointer-events: none;
+}
+
+#toastContainer>* {
+    pointer-events: auto;
 }
 
 .toast {
@@ -1554,4 +1559,73 @@ body {
 
 .btn-accent:active {
     transform: translateY(0);
+}
+
+/* Unsaved Changes Notification */
+.unsaved-notification {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 8px 32px rgba(168, 85, 247, 0.4);
+    z-index: 1001;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.unsaved-notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.unsaved-notification-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.unsaved-notification-icon {
+    flex-shrink: 0;
+}
+
+.unsaved-notification-icon svg {
+    stroke: #ffffff;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.unsaved-notification-text {
+    flex: 1;
+    color: white;
+}
+
+.unsaved-notification-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.unsaved-notification-message {
+    font-size: 0.875rem;
+    opacity: 0.95;
+}
+
+.unsaved-notification .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    background: white;
+    color: #a855f7;
+    border: none;
+    font-weight: 600;
+}
+
+.unsaved-notification .btn-sm:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-1px);
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tonys OpenSurv Manager 1.4.8</title>
+    <title>Tonys OpenSurv Manager 1.5</title>
     <meta name="description" content="Professional GUI for managing OpenSurv configuration">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@
                         </svg>
                     </div>
                     <div class="header-title">
-                        <h1>Tonys OpenSurv Manager 1.4.8</h1>
+                        <h1>Tonys OpenSurv Manager 1.5</h1>
                         <p class="subtitle">Configuration System</p>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h2>Welcome to Tonys OpenSurv Manager 1.4.8</h2>
+                        <h2>Welcome to Tonys OpenSurv Manager 1.5</h2>
                         <p>Select a screen from the sidebar or create a new one to get started</p>
                     </div>
                 </div>
@@ -574,7 +574,7 @@
                                     Checking for updates...</div>
                                 <div id="updateStatusSubtext"
                                     style="font-size: var(--font-size-xs); color: var(--text-muted);">Current Version:
-                                    <span id="currentVersionDisplay">1.4.8</span>
+                                    <span id="currentVersionDisplay">1.5</span>
                                 </div>
                             </div>
                             <button class="btn btn-primary" id="checkForUpdatesBtn" onclick="checkForUpdates()">Check
@@ -688,6 +688,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Unsaved Changes Notification -->
+    <div class="unsaved-notification" id="unsavedNotification">
+        <div class="unsaved-notification-content">
+            <div class="unsaved-notification-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+            </div>
+            <div class="unsaved-notification-text">
+                <div class="unsaved-notification-title">Unsaved Changes</div>
+                <div class="unsaved-notification-message">You have unsaved changes</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="saveConfig();" style="margin-left: auto;">
+                Save Now
+            </button>
+        </div>
+    </div>
+
 
     <script src="preview-drag.js"></script>
     <script src="script.js"></script>
