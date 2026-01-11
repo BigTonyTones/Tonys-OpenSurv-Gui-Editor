@@ -40,8 +40,14 @@ const YAMLParser = {
                 // Skip empty lines
                 if (trimmed === '') continue;
 
+                // Stop parsing when we hit the documentation/tutorial section
+                if (trimmed.startsWith('#####') || trimmed.includes('What follows is documentation')) {
+                    break;
+                }
+
                 // SPECIAL HANDLING FOR DISABLED (COMMENTED) STREAMS
-                if (trimmed.startsWith('#')) {
+                // Only look for these if we are inside a screen definition to avoid parsing tutorial text
+                if (currentScreen && trimmed.startsWith('#')) {
                     const content = trimmed.substring(1).trim();
                     let handledAsDisabled = false;
 
@@ -49,7 +55,16 @@ const YAMLParser = {
                     if (currentScreen && content.startsWith('- url:')) {
                         const urlMatch = content.match(/- url:\s*"([^"]+)"/);
                         if (urlMatch) {
+                            const url = urlMatch[1];
+                            // Ignore placeholder/tutorial URLs
+                            if (url.includes('://@') || url.includes(':suffix')) {
+                                lastComment = null;
+                                handledAsDisabled = true; // Mark as handled so we don't process it as a comment either
+                                continue;
+                            }
+
                             currentStream = {
+
                                 name: lastComment || null, // Use pending comment as name
                                 url: urlMatch[1],
                                 imageurl: null,

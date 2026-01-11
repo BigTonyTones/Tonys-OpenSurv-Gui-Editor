@@ -11,10 +11,11 @@ import shutil
 import json
 from datetime import datetime
 import time
+import logging
 from updater import GitHubUpdater
 
 
-VERSION = "1.4.7"
+VERSION = "1.4.8"
 PROGRAM_NAME = f"Tonys OpenSurv Manager {VERSION}"
 REPO_OWNER = "BigTonyTones"
 REPO_NAME = "Tonys-OpenSurv-Gui-Editor"
@@ -149,11 +150,13 @@ except ImportError as e:
     sys.exit(1)
 
 app = Flask(__name__, static_folder='web')
-app = Flask(__name__, static_folder='web')
 CORS(app)
+
+# Suppress development server warning
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 updater = GitHubUpdater(REPO_OWNER, REPO_NAME, VERSION)
 
-# Configuration
 # Configuration
 if os.name == 'posix':
     CONFIG_FILE = '/etc/opensurv/monitor1.yml'
@@ -616,14 +619,15 @@ if __name__ == '__main__':
     settings = load_settings()
     port = settings.get('port', 6453)
     
-    print('=' * 60)
-    print(f'{PROGRAM_NAME} - Backend Server')
-    print('=' * 60)
-    print(f'Configuration file: {os.path.abspath(CONFIG_FILE)}')
-    print('=' * 60)
-    print(f'Starting server on http://localhost:{port}')
-    print('Press Ctrl+C to stop')
-    print('=' * 60)
+    if not os.environ.get("WERKZEUG_RUN_MAIN"):
+        print('=' * 60)
+        print(f'{PROGRAM_NAME} - Backend Server')
+        print('=' * 60)
+        print(f'Configuration file: {os.path.abspath(CONFIG_FILE)}')
+        print('=' * 60)
+        print(f'Starting server on http://localhost:{port}')
+        print('Press Ctrl+C to stop')
+        print('=' * 60)
 
     if os.name == 'nt' and not os.environ.get("WERKZEUG_RUN_MAIN"):
         import webbrowser
