@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tonys OpenSurv Manager 1.5</title>
+    <title>Tonys OpenSurv Manager 1.6</title>
     <meta name="description" content="Professional GUI for managing OpenSurv configuration">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@
                         </svg>
                     </div>
                     <div class="header-title">
-                        <h1>Tonys OpenSurv Manager 1.5</h1>
+                        <h1>Tonys OpenSurv Manager 1.6</h1>
                         <p class="subtitle">Configuration System</p>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                                 </linearGradient>
                             </defs>
                         </svg>
-                        <h2>Welcome to Tonys OpenSurv Manager 1.5</h2>
+                        <h2>Welcome to Tonys OpenSurv Manager 1.6</h2>
                         <p>Select a screen from the sidebar or create a new one to get started</p>
                     </div>
                 </div>
@@ -307,10 +307,43 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="cameraUrl">Stream URL *</label>
+                    <label style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>Stream URL *</span>
+                        <button type="button" class="btn btn-sm btn-secondary" id="saveAsAlternateBtn"
+                            style="padding: 4px 12px; font-size: 0.85rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 4px;">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save as Alternate
+                        </button>
+                    </label>
                     <input type="text" id="cameraUrl" class="form-input"
                         placeholder="rtsp://user:password@192.168.1.100:554/stream">
                     <span class="form-hint">RTSP, HTTP, HTTPS, or file:// URL</span>
+                </div>
+
+                <div class="form-group" id="alternateUrlSection" style="display: none;">
+                    <label style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>Alternate URLs (Disabled)</span>
+                        <button type="button" class="btn btn-sm btn-secondary" id="addAlternateUrlBtn"
+                            style="padding: 4px 12px; font-size: 0.85rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 4px;">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Alternate
+                        </button>
+                    </label>
+                    <div id="alternateUrlsList"
+                        style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                        <!-- Alternate URLs will be dynamically added here -->
+                    </div>
+                    <span class="form-hint">These URLs are saved but disabled. Click "Activate" to make one the active
+                        URL.</span>
                 </div>
 
                 <div class="form-group">
@@ -574,7 +607,7 @@
                                     Checking for updates...</div>
                                 <div id="updateStatusSubtext"
                                     style="font-size: var(--font-size-xs); color: var(--text-muted);">Current Version:
-                                    <span id="currentVersionDisplay">1.5</span>
+                                    <span id="currentVersionDisplay">1.6</span>
                                 </div>
                             </div>
                             <button class="btn btn-primary" id="checkForUpdatesBtn" onclick="checkForUpdates()">Check

@@ -68,6 +68,7 @@ const YAMLParser = {
 
                                 name: lastComment || null, // Use pending comment as name
                                 url: urlMatch[1],
+                                alternate_urls: [],
                                 imageurl: null,
                                 showontop: null,
                                 enableaudio: null,
@@ -82,9 +83,15 @@ const YAMLParser = {
                             handledAsDisabled = true;
                         }
                     }
-                    // Case 2: Property of disabled stream
-                    else if (currentStream && currentStream.disabled) {
-                        if (content.startsWith('imageurl:')) {
+                    // Case 2: Property of disabled stream OR alternate URLs for any stream
+                    else if (currentStream && (currentStream.disabled || content.startsWith('alternate_url:'))) {
+                        if (content.startsWith('alternate_url:')) {
+                            const urlMatch = content.match(/alternate_url:\s*"([^"]+)"/);
+                            if (urlMatch) {
+                                currentStream.alternate_urls.push(urlMatch[1]);
+                            }
+                            handledAsDisabled = true;
+                        } else if (content.startsWith('imageurl:')) {
                             const value = content.split(':')[1].trim();
                             currentStream.imageurl = value === 'true' || value === 'True';
                             handledAsDisabled = true;
@@ -179,6 +186,7 @@ const YAMLParser = {
                         currentStream = {
                             name: lastComment || null, // Use the last comment as the camera name
                             url: urlMatch[1],
+                            alternate_urls: [],
                             imageurl: null,
                             showontop: null,
                             enableaudio: null,
@@ -196,7 +204,12 @@ const YAMLParser = {
 
                 // Stream properties
                 if (currentStream) {
-                    if (trimmed.startsWith('disabled:')) {
+                    if (trimmed.startsWith('alternate_url:')) {
+                        const urlMatch = trimmed.match(/alternate_url:\s*"([^"]+)"/);
+                        if (urlMatch) {
+                            currentStream.alternate_urls.push(urlMatch[1]);
+                        }
+                    } else if (trimmed.startsWith('disabled:')) {
                         const value = trimmed.split(':')[1].trim();
                         currentStream.disabled = value === 'True' || value === 'true';
                     } else if (trimmed.startsWith('imageurl:')) {
@@ -265,6 +278,12 @@ const YAMLParser = {
                 // Build the stream block
                 let sb = '';
                 sb += `        - url: "${stream.url}"\n`;
+
+                if (stream.alternate_urls && stream.alternate_urls.length > 0) {
+                    stream.alternate_urls.forEach(altUrl => {
+                        sb += `#         alternate_url: "${altUrl}"\n`;
+                    });
+                }
 
                 if (stream.imageurl !== null && stream.imageurl !== undefined) {
                     sb += `          imageurl: ${stream.imageurl ? 'true' : 'false'}\n`;
@@ -681,8 +700,11 @@ function openCameraModal(mode = 'add', cameraIndex = null) {
     modalTitle.textContent = mode === 'add' ? 'Add Camera' : 'Edit Camera';
 
     // Reset form
+    currentAlternateUrls = []; // Reset alternate URLs array
     document.getElementById('cameraName').value = '';
     document.getElementById('cameraUrl').value = '';
+    document.getElementById('alternateUrlsList').innerHTML = '';
+    document.getElementById('alternateUrlSection').style.display = 'none';
     document.getElementById('cameraImageUrl').checked = false;
     document.getElementById('cameraShowOnTop').checked = false;
     document.getElementById('cameraEnableAudio').checked = false;
@@ -704,6 +726,18 @@ function openCameraModal(mode = 'add', cameraIndex = null) {
 
         document.getElementById('cameraName').value = camera.name || '';
         document.getElementById('cameraUrl').value = camera.url || '';
+
+        // Load alternate URLs into global array
+        currentAlternateUrls = camera.alternate_urls ? [...camera.alternate_urls] : [];
+
+        // Show alternate URLs section if they exist
+        if (currentAlternateUrls.length > 0) {
+            renderAlternateUrlsList();
+            document.getElementById('alternateUrlSection').style.display = 'block';
+        } else {
+            document.getElementById('alternateUrlSection').style.display = 'none';
+        }
+
         document.getElementById('cameraImageUrl').checked = camera.imageurl || false;
         document.getElementById('cameraShowOnTop').checked = camera.showontop || false;
         document.getElementById('cameraEnableAudio').checked = camera.enableaudio || false;
@@ -743,6 +777,7 @@ function saveCamera() {
     const camera = {
         name: cameraName || null,
         url: url,
+        alternate_urls: currentAlternateUrls.length > 0 ? [...currentAlternateUrls] : [],
         imageurl: document.getElementById('cameraImageUrl').checked || null,
         showontop: document.getElementById('cameraShowOnTop').checked || null,
         enableaudio: document.getElementById('cameraEnableAudio').checked || null,
@@ -1822,4 +1857,121 @@ if (rawEditorClose) rawEditorClose.addEventListener('click', closeRawEditor);
 if (rawEditorCancel) rawEditorCancel.addEventListener('click', closeRawEditor);
 if (rawEditorSave) rawEditorSave.addEventListener('click', saveRawFile);
 
+// ===== Alternate URLs Management =====
+
+// Global array to store alternate URLs during editing
+let currentAlternateUrls = [];
+
+function renderAlternateUrlsList() {
+    const container = document.getElementById('alternateUrlsList');
+    container.innerHTML = '';
+
+    if (currentAlternateUrls.length === 0) {
+        container.innerHTML = '<div style="padding: 12px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No alternate URLs saved</div>';
+        return;
+    }
+
+    currentAlternateUrls.forEach((url, index) => {
+        const urlItem = document.createElement('div');
+        urlItem.style.cssText = 'display: flex; gap: 8px; align-items: center; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px;';
+
+        urlItem.innerHTML = `
+            <input type="text" value="${url}" readonly 
+                   style="flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 0.85rem; cursor: default; padding: 4px;">
+            <button type="button" class="btn btn-sm btn-success activate-url-btn" data-index="${index}" 
+                    style="padding: 4px 12px; font-size: 0.85rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Activate
+            </button>
+            <button type="button" class="btn btn-sm btn-danger-outline remove-url-btn" data-index="${index}" 
+                    style="padding: 4px 8px; font-size: 0.85rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        `;
+
+        container.appendChild(urlItem);
+    });
+
+    // Add event listeners for activate buttons
+    container.querySelectorAll('.activate-url-btn').forEach(btn => {
+        btn.addEventListener('click', () => activateAlternateUrl(parseInt(btn.dataset.index)));
+    });
+
+    // Add event listeners for remove buttons
+    container.querySelectorAll('.remove-url-btn').forEach(btn => {
+        btn.addEventListener('click', () => removeAlternateUrl(parseInt(btn.dataset.index)));
+    });
+}
+
+function addAlternateUrl() {
+    const activeUrlInput = document.getElementById('cameraUrl');
+    const currentActive = activeUrlInput.value.trim();
+
+    if (!currentActive) {
+        showToast('No URL', 'Please enter a stream URL first', 'warning');
+        return;
+    }
+
+    // Check if URL already exists in alternates
+    if (currentAlternateUrls.includes(currentActive)) {
+        showToast('Duplicate URL', 'This URL is already in the alternate list', 'warning');
+        return;
+    }
+
+    // Add current active URL to alternates
+    currentAlternateUrls.push(currentActive);
+
+    // Show section and render list
+    document.getElementById('alternateUrlSection').style.display = 'block';
+    renderAlternateUrlsList();
+
+    showToast('Added to Alternates', 'Current URL added to alternate URLs', 'success');
+}
+
+function activateAlternateUrl(index) {
+    const activeUrlInput = document.getElementById('cameraUrl');
+    const currentActive = activeUrlInput.value.trim();
+    const selectedUrl = currentAlternateUrls[index];
+
+    // Swap: put current active into the alternate list at the same position
+    currentAlternateUrls[index] = currentActive;
+
+    // Set the selected URL as active
+    activeUrlInput.value = selectedUrl;
+
+    // Re-render the list
+    renderAlternateUrlsList();
+
+    showToast('URL Activated', 'Alternate URL is now active', 'success');
+}
+
+function removeAlternateUrl(index) {
+    currentAlternateUrls.splice(index, 1);
+
+    // Hide section if no more alternates
+    if (currentAlternateUrls.length === 0) {
+        document.getElementById('alternateUrlSection').style.display = 'none';
+    }
+
+    renderAlternateUrlsList();
+    showToast('URL Removed', 'Alternate URL removed', 'success');
+}
+
+// Event listener for Add Alternate button
+document.addEventListener('DOMContentLoaded', () => {
+    const addAlternateBtn = document.getElementById('addAlternateUrlBtn');
+    if (addAlternateBtn) {
+        addAlternateBtn.addEventListener('click', addAlternateUrl);
+    }
+
+    const saveAsAlternateBtn = document.getElementById('saveAsAlternateBtn');
+    if (saveAsAlternateBtn) {
+        saveAsAlternateBtn.addEventListener('click', addAlternateUrl); // Same function as Add Alternate
+    }
+});
 
