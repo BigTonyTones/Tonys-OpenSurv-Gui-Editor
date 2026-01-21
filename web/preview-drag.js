@@ -73,7 +73,7 @@ window.showScreenPreviewDraggable = function () {
     resHeight.value = previewState.screenHeight;
 
     // Calculate auto-layout if cameras don't have force_coordinates
-    const camerasWithoutCoords = screen.streams.filter(s => !s.force_coordinates);
+    const camerasWithoutCoords = screen.streams.filter(s => !s.force_coordinates && !s.disabled);
 
     if (camerasWithoutCoords.length > 0) {
         const columns = screen.nr_of_columns || 2;
@@ -96,6 +96,8 @@ window.showScreenPreviewDraggable = function () {
 
     // Render all cameras
     screen.streams.forEach((stream, index) => {
+        if (stream.disabled) return; // Don't show camera if it's disabled
+
         const coords = stream.force_coordinates || stream._previewCoords;
         if (!coords || coords.length !== 4) return;
 
